@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Learning Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- LAUNCH SLIDE - ADD THIS FIRST -->
+    <div id="launchSlide" class="launch-slide">
+        <div class="launch-content">
+            <div class="launch-animation">
+                <div class="hand-icon">🤟</div>
+            </div>
+            <h1 class="launch-title">Sign Language Learner</h1>
+            <p class="launch-subtitle">Learn ASL at your own pace</p>
+            <button class="launch-button" onclick="enterSite()">
+                Click to Enter ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Header Section -->
+        <header>
+            <h1>🤟 Sign Language Learner</h1>
+            <p class="subtitle">Learn basic sign language at your own pace</p>
+        </header>
+
+        <!-- Navigation Menu -->
+        <nav class="main-nav" id="mainNav">
+            <button class="nav-btn active" data-section="home">🏠 Home</button>
+            <button class="nav-btn" data-section="lessons">📚 Lessons</button>
+            <button class="nav-btn" data-section="practice">🎮 Practice</button>
+            <button class="nav-btn" data-section="progress">📊 Progress</button>
+        </nav>
+
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="welcome-card">
+                <h2>Welcome to Sign Language Learning!</h2>
+                <p>Learn the basics of American Sign Language (ASL) through interactive lessons and fun games.</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalLearned">0</div>
+                        <div class="stat-label">Signs Learned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalScore">0</div>
+                        <div class="stat-label">Total Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="quizzesTaken">0</div>
+                        <div class="stat-label">Quizzes Completed</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary large" onclick="navigateToSection('lessons')">
+                    Start Learning 🚀
+                </button>
+            </div>
+        </section>
+
+        <!-- Lessons Section -->
+        <section id="lessons" class="section">
+            <h2>Choose a Lesson Category</h2>
+            
+            <div class="lesson-categories">
+                <div class="category-card" onclick="showLesson('alphabet')">
+                    <div class="category-icon">🔤</div>
+                    <h3>Alphabet</h3>
+                    <p>Learn A-Z in ASL</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-alphabet" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="category-card" onclick="showLesson('numbers')">
+                    <div class="category-icon">🔢</div>
+                    <h3>Numbers</h3>
+                    <p>Learn 0-10 in ASL</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-numbers" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="category-card" onclick="showLesson('greetings')">
+                    <div class="category-icon">👋</div>
+                    <h3>Greetings</h3>
+                    <p>Common greetings</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-greetings" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="category-card" onclick="showLesson('common')">
+                    <div class="category-icon">💬</div>
+                    <h3>Common Words</h3>
+                    <p>Everyday words</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-common" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lesson Detail View -->
+            <div id="lessonDetail" class="lesson-detail hidden">
+                <button class="btn-back" onclick="hideLesson()">← Back to Categories</button>
+                <h2 id="lessonTitle"></h2>
+                
+                <div class="flashcard-container">
+                    <div class="flashcard" id="flashcard">
+                        <div class="flashcard-content">
+                            <div class="sign-visual" id="signVisual"></div>
+                            <h3 id="signName"></h3>
+                            <p class="sign-description" id="signDescription"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard-controls">
+                    <button class="btn-secondary" id="prevBtn" onclick="previousSign()">← Previous</button>
+                    <span class="card-counter" id="cardCounter">1 / 1</span>
+                    <button class="btn-secondary" id="nextBtn" onclick="nextSign()">Next →</button>
+                </div>
+
+                <button class="btn-primary" onclick="startQuiz()">Take Quiz 🎯</button>
+            </div>
+        </section>
+
+        <!-- Practice Section -->
+        <section id="practice" class="section">
+            <div id="quizView" class="quiz-view">
+                <div class="quiz-header">
+                    <h2>Quiz: <span id="quizCategory"></span></h2>
+                    <div class="quiz-stats">
+                        <span>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></span>
+                        <span class="score">Score: <span id="quizScore">0</span></span>
+                    </div>
+                </div>
+
+                <div class="quiz-content">
+                    <div class="question-card">
+                        <div class="sign-display" id="quizSignDisplay"></div>
+                        <p class="question-text" id="questionText">What sign is this?</p>
+                    </div>
+
+                    <div class="options-grid" id="optionsGrid">
+                        <!-- Options will be inserted here by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="feedback hidden" id="feedback"></div>
+
+                <button class="btn-back" onclick="exitQuiz()">Exit Quiz</button>
+            </div>
+
+            <div id="quizResults" class="quiz-results hidden">
+                <h2>🎉 Quiz Complete!</h2>
+                <div class="results-card">
+                    <div class="results-score">
+                        <div class="big-score" id="finalScore">0</div>
+                        <p>out of <span id="finalTotal">10</span></p>
+                    </div>
+                    <div class="results-percentage" id="percentage"></div>
+                    <p class="results-message" id="resultsMessage"></p>
+                </div>
+                <div class="results-actions">
+                    <button class="btn-primary" onclick="retryQuiz()">Try Again</button>
+                    <button class="btn-secondary" onclick="navigateToSection('lessons')">Back to Lessons</button>
+                </div>
+            </div>
+
+            <div id="practiceHome" class="practice-home">
+                <h2>Practice Your Skills</h2>
+                <p>Select a category from the Lessons section and click "Take Quiz" to start practicing!</p>
+                <button class="btn-primary" onclick="navigateToSection('lessons')">Go to Lessons</button>
+            </div>
+        </section>
+
+        <!-- Progress Section -->
+        <section id="progress" class="section">
+            <h2>Your Learning Progress</h2>
+            
+            <div class="progress-overview">
+                <div class="progress-card">
+                    <h3>Overall Progress</h3>
+                    <div class="circular-progress">
+                        <svg width="150" height="150">
+                            <circle cx="75" cy="75" r="65" stroke="#e0e0e0" stroke-width="10" fill="none"></circle>
+                            <circle id="progressCircle" cx="75" cy="75" r="65" stroke="#4CAF50" stroke-width="10" fill="none" 
+                                    stroke-dasharray="408.4" stroke-dashoffset="408.4" 
+                                    transform="rotate(-90 75 75)"></circle>
+                        </svg>
+                        <div class="progress-text" id="overallProgress">0%</div>
+                    </div>
+                </div>
+
+                <div class="achievements">
+                    <h3>🏆 Achievements</h3>
+                    <div id="achievementsList">
+                        <!-- Achievements will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-progress">
+                <h3>Progress by Category</h3>
+                <div id="categoryProgressList">
+                    <!-- Progress bars will be inserted here -->
+                </div>
+            </div>
+
+            <button class="btn-danger" onclick="resetProgress()">Reset All Progress</button>
+        </section>
+
+    </div>
+
+    <!-- Firebase SDK - LOAD THESE FIRST -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script>
+        // TODO: Replace with your Firebase config from Firebase Console
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        console.log('Firebase initialized successfully!');
+    </script>
+
+    <!-- Your existing script.js -->
+    <script src="script.js"></script>
+</body>
+</html>
