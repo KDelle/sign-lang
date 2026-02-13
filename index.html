@@ -21,21 +21,28 @@
         </div>
     </div>
 
-    <!-- LOGIN PAGE -->
+    <!-- LOGIN PAGE WITH PASSWORD -->
     <div id="loginPage" class="login-page hidden">
         <div class="login-container">
             <div class="login-header">
                 <div class="login-icon">🤟</div>
                 <h2>Welcome to Sign Language Learner</h2>
-                <p>Please enter your information to get started</p>
+                <p id="loginSubtext">Please enter your information to get started</p>
             </div>
             
-            <form id="loginForm" class="login-form" onsubmit="handleLogin(event)">
+            <!-- Toggle between New User and Returning User -->
+            <div class="login-toggle">
+                <button class="toggle-btn active" id="newUserBtn" onclick="showNewUserForm()">New User</button>
+                <button class="toggle-btn" id="returningUserBtn" onclick="showReturningUserForm()">Returning User</button>
+            </div>
+
+            <!-- NEW USER FORM -->
+            <form id="newUserForm" class="login-form" onsubmit="handleNewUserSignup(event)">
                 <div class="form-group">
-                    <label for="userName">Full Name</label>
+                    <label for="newUserName">Full Name</label>
                     <input 
                         type="text" 
-                        id="userName" 
+                        id="newUserName" 
                         name="userName" 
                         placeholder="Enter your name" 
                         required
@@ -43,10 +50,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="userCourse">Course</label>
+                    <label for="newUserCourse">Course</label>
                     <input 
                         type="text" 
-                        id="userCourse" 
+                        id="newUserCourse" 
                         name="userCourse" 
                         placeholder="e.g., Computer Science" 
                         required
@@ -54,8 +61,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="userYear">Year Level</label>
-                    <select id="userYear" name="userYear" required>
+                    <label for="newUserYear">Year Level</label>
+                    <select id="newUserYear" name="userYear" required>
                         <option value="">Select your year</option>
                         <option value="1st Year">1st Year</option>
                         <option value="2nd Year">2nd Year</option>
@@ -66,8 +73,67 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="newUserPassword">Create Password</label>
+                    <input 
+                        type="password" 
+                        id="newUserPassword" 
+                        name="password" 
+                        placeholder="Create a password" 
+                        minlength="4"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        placeholder="Confirm your password" 
+                        minlength="4"
+                        required
+                    >
+                </div>
+
                 <button type="submit" class="login-submit-btn">
-                    Start Learning 🚀
+                    Create Account 🚀
+                </button>
+            </form>
+
+            <!-- RETURNING USER FORM -->
+            <form id="returningUserForm" class="login-form hidden" onsubmit="handleReturningUserLogin(event)">
+                <div class="form-group">
+                    <label for="returningUserName">Name</label>
+                    <input 
+                        type="text" 
+                        id="returningUserName" 
+                        name="userName" 
+                        placeholder="Enter your name" 
+                        required
+                        list="userNamesList"
+                    >
+                    <datalist id="userNamesList">
+                        <!-- Will be populated by JavaScript with existing users -->
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label for="returningUserPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="returningUserPassword" 
+                        name="password" 
+                        placeholder="Enter your password" 
+                        required
+                    >
+                </div>
+
+                <div class="login-error" id="loginError"></div>
+
+                <button type="submit" class="login-submit-btn">
+                    Login 🔓
                 </button>
             </form>
         </div>

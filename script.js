@@ -1,23 +1,54 @@
 /* ===================================
-   SIGN LANGUAGE LEARNING GAME - JAVASCRIPT
-   With Login System
+   SIGN LANGUAGE LEARNING GAME - COMPLETE
+   With Password Authentication & Multi-User Support
    =================================== */
 
 // ===================================
-// USER SESSION & LOGIN FUNCTIONS
+// USER DATABASE & AUTHENTICATION
 // ===================================
+
+// Get all users from localStorage
+function getAllUsers() {
+    const users = localStorage.getItem('signLanguageUsers');
+    return users ? JSON.parse(users) : [];
+}
+
+// Save all users to localStorage
+function saveAllUsers(users) {
+    localStorage.setItem('signLanguageUsers', JSON.stringify(users));
+}
+
+// Hash password (simple hash for demo)
+function hashPassword(password) {
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+        const char = password.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash.toString();
+}
+
+// Find user by name
+function findUserByName(name) {
+    const users = getAllUsers();
+    return users.find(user => user.name.toLowerCase() === name.toLowerCase());
+}
 
 // Check if user is already logged in
 function checkUserSession() {
-    const userData = localStorage.getItem('signLanguageUser');
-    if (userData) {
-        // User already logged in, skip to main app
-        const user = JSON.parse(userData);
-        showMainApp(user);
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+        const userData = JSON.parse(currentUser);
+        showMainApp(userData);
         return true;
     }
     return false;
 }
+
+// ===================================
+// LOGIN PAGE FUNCTIONS
+// ===================================
 
 // Show login page (after launch slide)
 function showLoginPage() {
@@ -25,78 +56,232 @@ function showLoginPage() {
     const loginPage = document.getElementById('loginPage');
     const mainApp = document.getElementById('mainApp');
     
-    // Hide launch slide
     launchSlide.classList.add('fade-out');
     setTimeout(() => {
         launchSlide.style.display = 'none';
     }, 800);
     
-    // Show login page
     setTimeout(() => {
         loginPage.classList.remove('hidden');
+        populateUserNamesList();
     }, 500);
     
-    // Hide main app initially
     mainApp.classList.add('hidden');
 }
 
-// Handle login form submission
-function handleLogin(event) {
-    event.preventDefault();
-    
-    const userName = document.getElementById('userName').value.trim();
-    const userCourse = document.getElementById('userCourse').value.trim();
-    const userYear = document.getElementById('userYear').value;
-    
-    if (userName && userCourse && userYear) {
-        const userData = {
-            name: userName,
-            course: userCourse,
-            year: userYear,
-            loginDate: new Date().toISOString()
-        };
-        
-        // Save to localStorage
-        localStorage.setItem('signLanguageUser', JSON.stringify(userData));
-        
-        // Show main app
-        showMainApp(userData);
-    }
+// Toggle between new user and returning user forms
+function showNewUserForm() {
+    document.getElementById('newUserForm').classList.remove('hidden');
+    document.getElementById('returningUserForm').classList.add('hidden');
+    document.getElementById('newUserBtn').classList.add('active');
+    document.getElementById('returningUserBtn').classList.remove('active');
+    document.getElementById('loginSubtext').textContent = 'Create your account to get started';
 }
 
-// Show main app and hide login
+function showReturningUserForm() {
+    document.getElementById('newUserForm').classList.add('hidden');
+    document.getElementById('returningUserForm').classList.remove('hidden');
+    document.getElementById('newUserBtn').classList.remove('active');
+    document.getElementById('returningUserBtn').classList.add('active');
+    document.getElementById('loginSubtext').textContent = 'Welcome back! Please login';
+    populateUserNamesList();
+}
+
+// Populate datalist with existing user names
+function populateUserNamesList() {
+    const users = getAllUsers();
+    const datalist = document.getElementById('userNamesList');
+    datalist.innerHTML = '';
+    
+    users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.name;
+        datalist.appendChild(option);
+    });
+}
+
+// ===================================
+// NEW USER SIGNUP
+// ===================================
+
+function handleNewUserSignup(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('newUserName').value.trim();
+    const course = document.getElementById('newUserCourse').value.trim();
+    const year = document.getElementById('newUserYear').value;
+    const password = document.getElementById('newUserPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (password !== confirmPassword) {
+        alert('Passwords do not match! Please try again.');
+        return;
+    }
+    
+    const existingUser = findUserByName(name);
+    if (existingUser) {
+        alert('A user with this name already exists! Please login or use a different name.');
+        return;
+    }
+    
+    const newUser = {
+        name: name,
+        course: course,
+        year: year,
+        password: hashPassword(password),
+        createdAt: new Date().toISOString(),
+        progress: {
+            learned: {
+                alphabet: [],
+                numbers: [],
+                greetings: [],
+                common: []
+            },
+            totalScore: 0,
+            quizzesTaken: 0,
+            achievements: []
+        }
+    };
+    
+    const users = getAllUsers();
+    users.push(newUser);
+    saveAllUsers(users);
+    
+    const userData = {
+        name: name,
+        course: course,
+        year: year
+    };
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    
+    alert('Account created successfully! Welcome aboard! 🎉');
+    showMainApp(userData);
+}
+
+// ===================================
+// RETURNING USER LOGIN
+// ===================================
+
+function handleReturningUserLogin(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('returningUserName').value.trim();
+    const password = document.getElementById('returningUserPassword').value;
+    const errorDiv = document.getElementById('loginError');
+    
+    const user = findUserByName(name);
+    
+    if (!user) {
+        errorDiv.textContent = 'User not found. Please check your name or create a new account.';
+        errorDiv.classList.add('show');
+        return;
+    }
+    
+    if (user.password !== hashPassword(password)) {
+        errorDiv.textContent = 'Incorrect password. Please try again.';
+        errorDiv.classList.add('show');
+        return;
+    }
+    
+    errorDiv.classList.remove('show');
+    
+    const userData = {
+        name: user.name,
+        course: user.course,
+        year: user.year
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    showMainApp(userData);
+}
+
+// ===================================
+// SHOW MAIN APP
+// ===================================
+
 function showMainApp(userData) {
     const loginPage = document.getElementById('loginPage');
     const mainApp = document.getElementById('mainApp');
     
-    // Hide login page
     loginPage.classList.add('hidden');
-    
-    // Show main app
     mainApp.classList.remove('hidden');
     
-    // Display user info in header
     displayUserInfo(userData);
-    
-    // Initialize app
+    loadUserProgress(userData.name);
     updateHomeStats();
     updateCategoryProgress();
 }
 
-// Display user info in header
+// Display user info in header with logout button
 function displayUserInfo(userData) {
     const userInfoDiv = document.getElementById('userInfo');
     userInfoDiv.innerHTML = `
-        <p><strong>Welcome, ${userData.name}!</strong></p>
-        <p>${userData.course} - ${userData.year}</p>
+        <div class="user-info-text">
+            <p><strong>Welcome, ${userData.name}!</strong></p>
+            <p>${userData.course} - ${userData.year}</p>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
     `;
 }
 
 // ===================================
-// LAUNCH SLIDE (initial screen)
+// USER PROGRESS MANAGEMENT
 // ===================================
 
-// Check on page load if user is already logged in
+function loadUserProgress(userName) {
+    const users = getAllUsers();
+    const user = users.find(u => u.name === userName);
+    
+    if (user && user.progress) {
+        localStorage.setItem('signLanguageProgress', JSON.stringify(user.progress));
+    }
+}
+
+function saveUserProgress() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return;
+    
+    const userData = JSON.parse(currentUser);
+    const progress = getProgress();
+    
+    const users = getAllUsers();
+    const userIndex = users.findIndex(u => u.name === userData.name);
+    
+    if (userIndex !== -1) {
+        users[userIndex].progress = progress;
+        users[userIndex].lastLogin = new Date().toISOString();
+        saveAllUsers(users);
+    }
+}
+
+// ===================================
+// LOGOUT FUNCTION
+// ===================================
+
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        saveUserProgress();
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('signLanguageProgress');
+        window.location.reload();
+    }
+}
+
+// ===================================
+// PAGE LOAD CHECK
+// ===================================
+
+window.addEventListener('DOMContentLoaded', function() {
+    if (checkUserSession()) {
+        document.getElementById('launchSlide').style.display = 'none';
+        document.getElementById('loginPage').classList.add('hidden');
+    }
+});
+
+window.addEventListener('beforeunload', function() {
+    saveUserProgress();
+});
+
 window.addEventListener('DOMContentLoaded', function() {
     if (checkUserSession()) {
         // User is logged in, hide launch slide and login, show main app
@@ -901,4 +1086,22 @@ function showPracticeHome() {
     document.getElementById('rhythmGame').classList.add('hidden');
     document.getElementById('rhythmResults').classList.add('hidden');
     document.getElementById('practiceHome').classList.remove('hidden');
+}
+
+// ===================================
+// OVERRIDE SAVEPROGRESS TO SAVE TO USER DATABASE
+// ===================================
+
+// Wrap the existing saveProgress function
+const _originalSaveProgress = typeof saveProgress !== 'undefined' ? saveProgress : function(progress) {
+    localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
+};
+
+function saveProgress(progress) {
+    // Save to session storage
+    if (progress) {
+        localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
+    }
+    // Also save to user database
+    saveUserProgress();
 }

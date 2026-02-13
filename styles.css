@@ -1316,3 +1316,145 @@ header h1 {
         gap: 10px;
     }
 }
+
+/* ===================================
+   PASSWORD LOGIN ADDITIONAL STYLES
+   =================================== */
+
+/* Login Toggle Buttons */
+.login-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: #f0f4ff;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.toggle-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Login Error Message */
+.login-error {
+    background: #ffe0e0;
+    color: #d32f2f;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    display: none;
+}
+
+.login-error.show {
+    display: block;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* Updated User Info Display with Logout Button */
+.user-info-display {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.user-info-text {
+    flex: 1;
+    text-align: left;
+}
+
+.user-info-display p {
+    margin: 5px 0;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.user-info-display strong {
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+.logout-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.logout-btn:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
+/* Datalist styling hint */
+input[list] {
+    cursor: pointer;
+}
+
+/* Success message animation */
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.login-submit-btn.success {
+    animation: successPulse 0.3s ease;
+}
+
+/* Mobile responsive updates for password login */
+@media (max-width: 768px) {
+    .user-info-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-info-text {
+        text-align: center;
+    }
+    
+    .logout-btn {
+        width: 100%;
+    }
+}
