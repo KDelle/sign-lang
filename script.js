@@ -1,29 +1,114 @@
 /* ===================================
    SIGN LANGUAGE LEARNING GAME - JAVASCRIPT
-   Main logic file with all functionality
+   With Login System
    =================================== */
 
 // ===================================
-// LAUNCH SLIDE FUNCTION
+// USER SESSION & LOGIN FUNCTIONS
 // ===================================
 
-function enterSite() {
+// Check if user is already logged in
+function checkUserSession() {
+    const userData = localStorage.getItem('signLanguageUser');
+    if (userData) {
+        // User already logged in, skip to main app
+        const user = JSON.parse(userData);
+        showMainApp(user);
+        return true;
+    }
+    return false;
+}
+
+// Show login page (after launch slide)
+function showLoginPage() {
     const launchSlide = document.getElementById('launchSlide');
-    if (launchSlide) {
-        launchSlide.classList.add('fade-out');
+    const loginPage = document.getElementById('loginPage');
+    const mainApp = document.getElementById('mainApp');
+    
+    // Hide launch slide
+    launchSlide.classList.add('fade-out');
+    setTimeout(() => {
+        launchSlide.style.display = 'none';
+    }, 800);
+    
+    // Show login page
+    setTimeout(() => {
+        loginPage.classList.remove('hidden');
+    }, 500);
+    
+    // Hide main app initially
+    mainApp.classList.add('hidden');
+}
+
+// Handle login form submission
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const userName = document.getElementById('userName').value.trim();
+    const userCourse = document.getElementById('userCourse').value.trim();
+    const userYear = document.getElementById('userYear').value;
+    
+    if (userName && userCourse && userYear) {
+        const userData = {
+            name: userName,
+            course: userCourse,
+            year: userYear,
+            loginDate: new Date().toISOString()
+        };
         
-        // Remove the launch slide from DOM after animation
-        setTimeout(() => {
-            launchSlide.style.display = 'none';
-        }, 800);
+        // Save to localStorage
+        localStorage.setItem('signLanguageUser', JSON.stringify(userData));
+        
+        // Show main app
+        showMainApp(userData);
     }
 }
+
+// Show main app and hide login
+function showMainApp(userData) {
+    const loginPage = document.getElementById('loginPage');
+    const mainApp = document.getElementById('mainApp');
+    
+    // Hide login page
+    loginPage.classList.add('hidden');
+    
+    // Show main app
+    mainApp.classList.remove('hidden');
+    
+    // Display user info in header
+    displayUserInfo(userData);
+    
+    // Initialize app
+    updateHomeStats();
+    updateCategoryProgress();
+}
+
+// Display user info in header
+function displayUserInfo(userData) {
+    const userInfoDiv = document.getElementById('userInfo');
+    userInfoDiv.innerHTML = `
+        <p><strong>Welcome, ${userData.name}!</strong></p>
+        <p>${userData.course} - ${userData.year}</p>
+    `;
+}
+
+// ===================================
+// LAUNCH SLIDE (initial screen)
+// ===================================
+
+// Check on page load if user is already logged in
+window.addEventListener('DOMContentLoaded', function() {
+    if (checkUserSession()) {
+        // User is logged in, hide launch slide and login, show main app
+        document.getElementById('launchSlide').style.display = 'none';
+        document.getElementById('loginPage').classList.add('hidden');
+    }
+});
 
 // ===================================
 // SIGN LANGUAGE DATA
 // ===================================
 
-// Alphabet signs (A-Z) with emoji representations
 const alphabetSigns = [
     { id: 'a', name: 'A', visual: '✊', description: 'Closed fist with thumb to the side' },
     { id: 'b', name: 'B', visual: '🖐️', description: 'Open hand, fingers together, thumb across palm' },
@@ -53,7 +138,6 @@ const alphabetSigns = [
     { id: 'z', name: 'Z', visual: '☝️', description: 'Index finger draws Z in air' }
 ];
 
-// Number signs (0-10)
 const numberSigns = [
     { id: '0', name: '0', visual: '👌', description: 'Circle with thumb and index' },
     { id: '1', name: '1', visual: '☝️', description: 'Index finger up' },
@@ -68,7 +152,6 @@ const numberSigns = [
     { id: '10', name: '10', visual: '👊', description: 'Shake fist or show thumb (A + wiggle)' }
 ];
 
-// Common greetings
 const greetingSigns = [
     { id: 'hello', name: 'Hello', visual: '👋', description: 'Wave hand side to side' },
     { id: 'goodbye', name: 'Goodbye', visual: '👋', description: 'Wave hand up and down' },
@@ -80,7 +163,6 @@ const greetingSigns = [
     { id: 'help', name: 'Help', visual: '🆘', description: 'One hand lifts the other' }
 ];
 
-// Common words
 const commonSigns = [
     { id: 'eat', name: 'Eat', visual: '🍽️', description: 'Fingers to mouth repeatedly' },
     { id: 'drink', name: 'Drink', visual: '🥤', description: 'C hand to mouth like holding cup' },
@@ -94,7 +176,6 @@ const commonSigns = [
     { id: 'sad', name: 'Sad', visual: '😢', description: 'Hands slide down face' }
 ];
 
-// Group all signs by category
 const signCategories = {
     alphabet: alphabetSigns,
     numbers: numberSigns,
@@ -117,7 +198,6 @@ let currentQuestionIndex = 0;
 // LOCAL STORAGE FUNCTIONS
 // ===================================
 
-// Initialize or get user progress from localStorage
 function getProgress() {
     const defaultProgress = {
         learned: {
@@ -135,12 +215,10 @@ function getProgress() {
     return saved ? JSON.parse(saved) : defaultProgress;
 }
 
-// Save progress to localStorage
 function saveProgress(progress) {
     localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
 }
 
-// Mark a sign as learned
 function markSignLearned(category, signId) {
     const progress = getProgress();
     if (!progress.learned[category].includes(signId)) {
@@ -149,19 +227,14 @@ function markSignLearned(category, signId) {
     }
 }
 
-// Update quiz statistics
 function updateQuizStats(score, total) {
     const progress = getProgress();
     progress.totalScore += score;
     progress.quizzesTaken += 1;
-    
-    // Check for achievements
     checkAchievements(progress);
-    
     saveProgress(progress);
 }
 
-// Reset all progress
 function resetProgress() {
     if (confirm('Are you sure you want to reset all your progress? This cannot be undone.')) {
         localStorage.removeItem('signLanguageProgress');
@@ -176,17 +249,13 @@ function resetProgress() {
 // NAVIGATION FUNCTIONS
 // ===================================
 
-// Navigate between main sections
 function navigateToSection(sectionName) {
-    // Hide all sections
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
     });
     
-    // Show selected section
     document.getElementById(sectionName).classList.add('active');
     
-    // Update navigation buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.section === sectionName) {
@@ -196,7 +265,6 @@ function navigateToSection(sectionName) {
     
     currentSection = sectionName;
     
-    // Special handling for different sections
     if (sectionName === 'home') {
         updateHomeStats();
     } else if (sectionName === 'practice') {
@@ -208,31 +276,22 @@ function navigateToSection(sectionName) {
     }
 }
 
-// Setup navigation event listeners
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             navigateToSection(this.dataset.section);
         });
     });
-    
-    // Initialize the app
-    updateHomeStats();
-    updateCategoryProgress();
 });
 
 // ===================================
 // HOME SECTION FUNCTIONS
 // ===================================
 
-// Update statistics on home page
 function updateHomeStats() {
     const progress = getProgress();
-    
-    // Calculate total signs learned
     const totalLearned = Object.values(progress.learned).reduce((sum, arr) => sum + arr.length, 0);
     
-    // Update display
     document.getElementById('totalLearned').textContent = totalLearned;
     document.getElementById('totalScore').textContent = progress.totalScore;
     document.getElementById('quizzesTaken').textContent = progress.quizzesTaken;
@@ -242,16 +301,13 @@ function updateHomeStats() {
 // LESSON SECTION FUNCTIONS
 // ===================================
 
-// Show lesson detail for a category
 function showLesson(category) {
     currentCategory = category;
     currentSignIndex = 0;
     
-    // Hide category grid and show lesson detail
     document.querySelector('.lesson-categories').style.display = 'none';
     document.getElementById('lessonDetail').classList.remove('hidden');
     
-    // Update lesson title
     const titles = {
         alphabet: 'Alphabet (A-Z)',
         numbers: 'Numbers (0-10)',
@@ -260,42 +316,33 @@ function showLesson(category) {
     };
     document.getElementById('lessonTitle').textContent = titles[category];
     
-    // Display first sign
     displayCurrentSign();
 }
 
-// Hide lesson detail and return to categories
 function hideLesson() {
     document.querySelector('.lesson-categories').style.display = 'grid';
     document.getElementById('lessonDetail').classList.add('hidden');
     currentCategory = null;
 }
 
-// Display the current sign in flashcard
 function displayCurrentSign() {
     if (!currentCategory) return;
     
     const signs = signCategories[currentCategory];
     const sign = signs[currentSignIndex];
     
-    // Update flashcard content
     document.getElementById('signVisual').textContent = sign.visual;
     document.getElementById('signName').textContent = sign.name;
     document.getElementById('signDescription').textContent = sign.description;
-    
-    // Update counter
     document.getElementById('cardCounter').textContent = `${currentSignIndex + 1} / ${signs.length}`;
     
-    // Enable/disable navigation buttons
     document.getElementById('prevBtn').disabled = currentSignIndex === 0;
     document.getElementById('nextBtn').disabled = currentSignIndex === signs.length - 1;
     
-    // Mark as learned
     markSignLearned(currentCategory, sign.id);
     updateCategoryProgress();
 }
 
-// Navigate to previous sign
 function previousSign() {
     if (currentSignIndex > 0) {
         currentSignIndex--;
@@ -303,7 +350,6 @@ function previousSign() {
     }
 }
 
-// Navigate to next sign
 function nextSign() {
     const signs = signCategories[currentCategory];
     if (currentSignIndex < signs.length - 1) {
@@ -312,7 +358,6 @@ function nextSign() {
     }
 }
 
-// Update progress bars for each category
 function updateCategoryProgress() {
     const progress = getProgress();
     
@@ -332,19 +377,15 @@ function updateCategoryProgress() {
 // QUIZ FUNCTIONS
 // ===================================
 
-// Start a quiz for current category
 function startQuiz() {
     if (!currentCategory) return;
     
-    // Switch to practice section
     navigateToSection('practice');
     
-    // Hide practice home, show quiz view
     document.getElementById('practiceHome').classList.add('hidden');
     document.getElementById('quizResults').classList.add('hidden');
     document.getElementById('quizView').classList.remove('hidden');
     
-    // Initialize quiz
     const signs = signCategories[currentCategory];
     currentQuiz = {
         category: currentCategory,
@@ -355,7 +396,6 @@ function startQuiz() {
     quizScore = 0;
     currentQuestionIndex = 0;
     
-    // Update quiz header
     const categoryNames = {
         alphabet: 'Alphabet',
         numbers: 'Numbers',
@@ -365,28 +405,20 @@ function startQuiz() {
     document.getElementById('quizCategory').textContent = categoryNames[currentCategory];
     document.getElementById('totalQuestions').textContent = currentQuiz.totalQuestions;
     
-    // Show first question
     showQuizQuestion();
 }
 
-// Generate quiz questions (random selection)
 function generateQuizQuestions(signs) {
     const questions = [];
     const numQuestions = Math.min(10, signs.length);
-    
-    // Create a copy and shuffle
     const shuffled = [...signs].sort(() => Math.random() - 0.5);
     
     for (let i = 0; i < numQuestions; i++) {
         const correctSign = shuffled[i];
-        
-        // Generate wrong options
         const wrongOptions = signs
             .filter(s => s.id !== correctSign.id)
             .sort(() => Math.random() - 0.5)
             .slice(0, 3);
-        
-        // Combine and shuffle options
         const options = [correctSign, ...wrongOptions].sort(() => Math.random() - 0.5);
         
         questions.push({
@@ -398,18 +430,13 @@ function generateQuizQuestions(signs) {
     return questions;
 }
 
-// Display current quiz question
 function showQuizQuestion() {
     const question = currentQuiz.questions[currentQuestionIndex];
     
-    // Update question counter and score
     document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
     document.getElementById('quizScore').textContent = quizScore;
-    
-    // Display the sign
     document.getElementById('quizSignDisplay').textContent = question.correctSign.visual;
     
-    // Generate option buttons
     const optionsGrid = document.getElementById('optionsGrid');
     optionsGrid.innerHTML = '';
     
@@ -421,18 +448,14 @@ function showQuizQuestion() {
         optionsGrid.appendChild(button);
     });
     
-    // Hide feedback
     document.getElementById('feedback').classList.add('hidden');
 }
 
-// Handle answer selection
 function selectAnswer(isCorrect, buttonElement) {
-    // Disable all option buttons
     document.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
     });
     
-    // Show feedback
     const feedback = document.getElementById('feedback');
     feedback.classList.remove('hidden');
     
@@ -446,7 +469,6 @@ function selectAnswer(isCorrect, buttonElement) {
         feedback.className = 'feedback incorrect';
         feedback.textContent = '✗ Incorrect. Try to remember this one!';
         
-        // Highlight correct answer
         const correctSign = currentQuiz.questions[currentQuestionIndex].correctSign;
         document.querySelectorAll('.option-btn').forEach(btn => {
             if (btn.textContent === correctSign.name) {
@@ -455,7 +477,6 @@ function selectAnswer(isCorrect, buttonElement) {
         });
     }
     
-    // Move to next question after delay
     setTimeout(() => {
         currentQuestionIndex++;
         if (currentQuestionIndex < currentQuiz.totalQuestions) {
@@ -466,21 +487,16 @@ function selectAnswer(isCorrect, buttonElement) {
     }, 1500);
 }
 
-// Show quiz results
 function showQuizResults() {
-    // Hide quiz view, show results
     document.getElementById('quizView').classList.add('hidden');
     document.getElementById('quizResults').classList.remove('hidden');
     
-    // Calculate percentage
     const percentage = Math.round((quizScore / currentQuiz.totalQuestions) * 100);
     
-    // Update display
     document.getElementById('finalScore').textContent = quizScore;
     document.getElementById('finalTotal').textContent = currentQuiz.totalQuestions;
     document.getElementById('percentage').textContent = percentage + '%';
     
-    // Show motivational message
     let message = '';
     if (percentage === 100) {
         message = '🌟 Perfect score! You\'re a sign language master!';
@@ -493,21 +509,17 @@ function showQuizResults() {
     }
     document.getElementById('resultsMessage').textContent = message;
     
-    // Update statistics
     updateQuizStats(quizScore, currentQuiz.totalQuestions);
 }
 
-// Retry the same quiz
 function retryQuiz() {
     startQuiz();
 }
 
-// Exit quiz and return to practice home
 function exitQuiz() {
     showPracticeHome();
 }
 
-// Show practice home screen
 function showPracticeHome() {
     document.getElementById('quizView').classList.add('hidden');
     document.getElementById('quizResults').classList.add('hidden');
@@ -518,24 +530,19 @@ function showPracticeHome() {
 // PROGRESS SECTION FUNCTIONS
 // ===================================
 
-// Update progress displays
 function updateProgressDisplay() {
     const progress = getProgress();
     
-    // Calculate overall progress
     const totalSigns = Object.values(signCategories).reduce((sum, arr) => sum + arr.length, 0);
     const learnedSigns = Object.values(progress.learned).reduce((sum, arr) => sum + arr.length, 0);
     const overallPercentage = Math.round((learnedSigns / totalSigns) * 100);
     
-    // Update circular progress
     document.getElementById('overallProgress').textContent = overallPercentage + '%';
     
-    // Update SVG circle (circumference = 2 * π * r = 2 * π * 65 ≈ 408.4)
     const circumference = 408.4;
     const offset = circumference - (overallPercentage / 100) * circumference;
     document.getElementById('progressCircle').style.strokeDashoffset = offset;
     
-    // Update category progress list
     const categoryProgressList = document.getElementById('categoryProgressList');
     categoryProgressList.innerHTML = '';
     
@@ -565,7 +572,6 @@ function updateProgressDisplay() {
         categoryProgressList.appendChild(progressItem);
     });
     
-    // Update achievements
     displayAchievements(progress);
 }
 
@@ -573,85 +579,67 @@ function updateProgressDisplay() {
 // ACHIEVEMENTS SYSTEM
 // ===================================
 
-// Define achievements
 const achievements = [
     {
         id: 'first_sign',
         icon: '🎯',
         title: 'First Sign',
         description: 'Learn your first sign',
-        condition: (progress) => {
-            return Object.values(progress.learned).some(arr => arr.length > 0);
-        }
+        condition: (progress) => Object.values(progress.learned).some(arr => arr.length > 0)
     },
     {
         id: 'alphabet_master',
         icon: '🔤',
         title: 'Alphabet Master',
         description: 'Complete the alphabet category',
-        condition: (progress) => {
-            return progress.learned.alphabet.length === signCategories.alphabet.length;
-        }
+        condition: (progress) => progress.learned.alphabet.length === signCategories.alphabet.length
     },
     {
         id: 'number_guru',
         icon: '🔢',
         title: 'Number Guru',
         description: 'Complete the numbers category',
-        condition: (progress) => {
-            return progress.learned.numbers.length === signCategories.numbers.length;
-        }
+        condition: (progress) => progress.learned.numbers.length === signCategories.numbers.length
     },
     {
         id: 'social_butterfly',
         icon: '👋',
         title: 'Social Butterfly',
         description: 'Complete the greetings category',
-        condition: (progress) => {
-            return progress.learned.greetings.length === signCategories.greetings.length;
-        }
+        condition: (progress) => progress.learned.greetings.length === signCategories.greetings.length
     },
     {
         id: 'word_wizard',
         icon: '💬',
         title: 'Word Wizard',
         description: 'Complete the common words category',
-        condition: (progress) => {
-            return progress.learned.common.length === signCategories.common.length;
-        }
+        condition: (progress) => progress.learned.common.length === signCategories.common.length
     },
     {
         id: 'quiz_taker',
         icon: '📝',
         title: 'Quiz Taker',
         description: 'Complete your first quiz',
-        condition: (progress) => {
-            return progress.quizzesTaken >= 1;
-        }
+        condition: (progress) => progress.quizzesTaken >= 1
     },
     {
         id: 'dedicated_learner',
         icon: '⭐',
         title: 'Dedicated Learner',
         description: 'Complete 10 quizzes',
-        condition: (progress) => {
-            return progress.quizzesTaken >= 10;
-        }
+        condition: (progress) => progress.quizzesTaken >= 10
     },
     {
         id: 'sign_master',
         icon: '🏆',
         title: 'Sign Language Master',
         description: 'Complete all categories',
-        condition: (progress) => {
-            return Object.keys(signCategories).every(category => {
-                return progress.learned[category].length === signCategories[category].length;
-            });
-        }
+        condition: (progress) => Object.keys(signCategories).every(category => 
+            progress.learned[category].length === signCategories[category].length
+        )
     }
 ];
 
-// Check and unlock achievements
 function checkAchievements(progress) {
     achievements.forEach(achievement => {
         if (!progress.achievements.includes(achievement.id) && achievement.condition(progress)) {
@@ -661,13 +649,10 @@ function checkAchievements(progress) {
     });
 }
 
-// Show achievement unlock notification
 function showAchievementNotification(achievement) {
-    // Simple alert for now (could be enhanced with custom modal)
     alert(`🎉 Achievement Unlocked!\n\n${achievement.icon} ${achievement.title}\n${achievement.description}`);
 }
 
-// Display achievements in progress section
 function displayAchievements(progress) {
     const achievementsList = document.getElementById('achievementsList');
     achievementsList.innerHTML = '';
@@ -687,14 +672,233 @@ function displayAchievements(progress) {
         achievementsList.appendChild(achievementItem);
     });
 }
+/* ===================================
+   ASL RHYTHM GAME
+   Add this to the end of your script.js file
+   =================================== */
 
 // ===================================
-// INITIALIZATION
+// RHYTHM GAME STATE
 // ===================================
 
-// Initialize the application when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Sign Language Learning Game Initialized!');
-    updateHomeStats();
-    updateCategoryProgress();
-});
+let rhythmGame = {
+    isPlaying: false,
+    score: 0,
+    combo: 0,
+    maxCombo: 0,
+    fallingSign: null,
+    gameSpeed: 3000, // milliseconds for sign to fall
+    spawnInterval: null,
+    animationFrame: null,
+    category: 'alphabet'
+};
+
+// ===================================
+// RHYTHM GAME FUNCTIONS
+// ===================================
+
+function startRhythmGame(category = 'alphabet') {
+    rhythmGame.category = category;
+    rhythmGame.isPlaying = true;
+    rhythmGame.score = 0;
+    rhythmGame.combo = 0;
+    rhythmGame.maxCombo = 0;
+    
+    // Hide practice home and show rhythm game
+    document.getElementById('practiceHome').classList.add('hidden');
+    document.getElementById('rhythmGame').classList.remove('hidden');
+    
+    // Update UI
+    updateRhythmGameUI();
+    
+    // Start spawning signs
+    spawnFallingSign();
+    rhythmGame.spawnInterval = setInterval(spawnFallingSign, rhythmGame.gameSpeed);
+}
+
+function spawnFallingSign() {
+    if (!rhythmGame.isPlaying) return;
+    
+    const signs = signCategories[rhythmGame.category];
+    const correctSign = signs[Math.floor(Math.random() * signs.length)];
+    
+    // Generate wrong options
+    const wrongOptions = signs
+        .filter(s => s.id !== correctSign.id)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2);
+    
+    // Shuffle all options
+    const allOptions = [correctSign, ...wrongOptions].sort(() => Math.random() - 0.5);
+    
+    rhythmGame.fallingSign = {
+        sign: correctSign,
+        options: allOptions,
+        position: 0,
+        startTime: Date.now()
+    };
+    
+    // Display the falling sign
+    displayFallingSign();
+    
+    // Animate the sign falling
+    animateFallingSign();
+}
+
+function displayFallingSign() {
+    const signElement = document.getElementById('fallingSign');
+    const optionsContainer = document.getElementById('rhythmOptions');
+    
+    signElement.textContent = rhythmGame.fallingSign.sign.visual;
+    signElement.style.top = '0%';
+    
+    // Generate option buttons
+    optionsContainer.innerHTML = '';
+    rhythmGame.fallingSign.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'rhythm-option-btn';
+        button.textContent = option.name;
+        button.onclick = () => checkRhythmAnswer(option.id === rhythmGame.fallingSign.sign.id);
+        optionsContainer.appendChild(button);
+    });
+}
+
+function animateFallingSign() {
+    if (!rhythmGame.isPlaying || !rhythmGame.fallingSign) return;
+    
+    const elapsed = Date.now() - rhythmGame.fallingSign.startTime;
+    const progress = Math.min(elapsed / rhythmGame.gameSpeed, 1);
+    
+    rhythmGame.fallingSign.position = progress * 100;
+    
+    const signElement = document.getElementById('fallingSign');
+    signElement.style.top = rhythmGame.fallingSign.position + '%';
+    
+    // Check if sign reached bottom (missed)
+    if (progress >= 1) {
+        missedSign();
+        return;
+    }
+    
+    // Continue animation
+    rhythmGame.animationFrame = requestAnimationFrame(animateFallingSign);
+}
+
+function checkRhythmAnswer(isCorrect) {
+    if (!rhythmGame.fallingSign) return;
+    
+    cancelAnimationFrame(rhythmGame.animationFrame);
+    
+    const signElement = document.getElementById('fallingSign');
+    const feedbackElement = document.getElementById('rhythmFeedback');
+    
+    if (isCorrect) {
+        // Correct answer!
+        rhythmGame.score += 10;
+        rhythmGame.combo++;
+        rhythmGame.maxCombo = Math.max(rhythmGame.maxCombo, rhythmGame.combo);
+        
+        // Show correct feedback
+        signElement.classList.add('rhythm-correct');
+        feedbackElement.textContent = '✓ Perfect!';
+        feedbackElement.className = 'rhythm-feedback show correct';
+        
+        // Speed up slightly
+        rhythmGame.gameSpeed = Math.max(2000, rhythmGame.gameSpeed - 50);
+    } else {
+        // Wrong answer
+        rhythmGame.combo = 0;
+        
+        signElement.classList.add('rhythm-wrong');
+        feedbackElement.textContent = '✗ Wrong!';
+        feedbackElement.className = 'rhythm-feedback show wrong';
+    }
+    
+    updateRhythmGameUI();
+    
+    // Clear and prepare for next
+    setTimeout(() => {
+        signElement.classList.remove('rhythm-correct', 'rhythm-wrong');
+        feedbackElement.classList.remove('show');
+        rhythmGame.fallingSign = null;
+    }, 300);
+}
+
+function missedSign() {
+    if (!rhythmGame.fallingSign) return;
+    
+    rhythmGame.combo = 0;
+    
+    const feedbackElement = document.getElementById('rhythmFeedback');
+    feedbackElement.textContent = 'Missed!';
+    feedbackElement.className = 'rhythm-feedback show wrong';
+    
+    updateRhythmGameUI();
+    
+    setTimeout(() => {
+        feedbackElement.classList.remove('show');
+        rhythmGame.fallingSign = null;
+    }, 300);
+}
+
+function updateRhythmGameUI() {
+    document.getElementById('rhythmScore').textContent = rhythmGame.score;
+    document.getElementById('rhythmCombo').textContent = rhythmGame.combo;
+}
+
+function stopRhythmGame() {
+    rhythmGame.isPlaying = false;
+    clearInterval(rhythmGame.spawnInterval);
+    cancelAnimationFrame(rhythmGame.animationFrame);
+    
+    // Show results
+    showRhythmGameResults();
+}
+
+function showRhythmGameResults() {
+    document.getElementById('rhythmGame').classList.add('hidden');
+    document.getElementById('rhythmResults').classList.remove('hidden');
+    
+    document.getElementById('rhythmFinalScore').textContent = rhythmGame.score;
+    document.getElementById('rhythmMaxCombo').textContent = rhythmGame.maxCombo;
+    
+    let message = '';
+    if (rhythmGame.score >= 100) {
+        message = '🌟 Amazing! You have great rhythm!';
+    } else if (rhythmGame.score >= 50) {
+        message = '🎉 Good job! Keep practicing!';
+    } else {
+        message = '💪 Nice try! Practice makes perfect!';
+    }
+    document.getElementById('rhythmResultMessage').textContent = message;
+}
+
+function retryRhythmGame() {
+    document.getElementById('rhythmResults').classList.add('hidden');
+    startRhythmGame(rhythmGame.category);
+}
+
+function exitRhythmGame() {
+    rhythmGame.isPlaying = false;
+    clearInterval(rhythmGame.spawnInterval);
+    cancelAnimationFrame(rhythmGame.animationFrame);
+    
+    document.getElementById('rhythmGame').classList.add('hidden');
+    document.getElementById('rhythmResults').classList.add('hidden');
+    document.getElementById('practiceHome').classList.remove('hidden');
+}
+
+function showPracticeHome() {
+    // Stop any running games
+    if (rhythmGame.isPlaying) {
+        rhythmGame.isPlaying = false;
+        clearInterval(rhythmGame.spawnInterval);
+        cancelAnimationFrame(rhythmGame.animationFrame);
+    }
+    
+    document.getElementById('quizView').classList.add('hidden');
+    document.getElementById('quizResults').classList.add('hidden');
+    document.getElementById('rhythmGame').classList.add('hidden');
+    document.getElementById('rhythmResults').classList.add('hidden');
+    document.getElementById('practiceHome').classList.remove('hidden');
+}
