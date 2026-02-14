@@ -293,8 +293,98 @@ window.addEventListener('DOMContentLoaded', function() {
 // ===================================
 // SIGN LANGUAGE DATA
 // ===================================
+/* ===================================
+   MULTI-LANGUAGE SIGN LANGUAGE SYSTEM
+   ASL + FSL (Filipino Sign Language)
+   Add this AFTER the authentication code, BEFORE the existing sign data
+   =================================== */
 
-const alphabetSigns = [
+// ===================================
+// CURRENT LANGUAGE STATE
+// ===================================
+
+let currentLanguage = 'asl'; // Default to ASL
+
+// ===================================
+// FILIPINO SIGN LANGUAGE (FSL) DATA
+// ===================================
+
+const fslAlphabetSigns = [
+    { id: 'a', name: 'A', visual: '✊', description: 'Closed fist, similar to ASL but thumb may be more forward' },
+    { id: 'b', name: 'B', visual: '🖐️', description: 'Open hand with fingers together, thumb folded' },
+    { id: 'c', name: 'C', visual: '👌', description: 'Curved hand forming C shape' },
+    { id: 'd', name: 'D', visual: '☝️', description: 'Index finger pointing up, middle touches thumb' },
+    { id: 'e', name: 'E', visual: '✊', description: 'Closed fist with fingers curled inward' },
+    { id: 'f', name: 'F', visual: '👌', description: 'Thumb and index form circle, other fingers extended' },
+    { id: 'g', name: 'G', visual: '👈', description: 'Index and thumb point sideways' },
+    { id: 'h', name: 'H', visual: '🤞', description: 'Index and middle extended horizontally' },
+    { id: 'i', name: 'I', visual: '🤙', description: 'Pinky extended upward' },
+    { id: 'j', name: 'J', visual: '🤙', description: 'Pinky draws J shape in air' },
+    { id: 'k', name: 'K', visual: '✌️', description: 'Index and middle up, thumb between' },
+    { id: 'l', name: 'L', visual: '👍', description: 'L shape with index and thumb' },
+    { id: 'm', name: 'M', visual: '✊', description: 'Thumb tucked under three fingers' },
+    { id: 'n', name: 'N', visual: '✊', description: 'Thumb under first two fingers' },
+    { id: 'o', name: 'O', visual: '👌', description: 'Fingers form O with thumb' },
+    { id: 'p', name: 'P', visual: '👇', description: 'K shape pointing downward' },
+    { id: 'q', name: 'Q', visual: '👇', description: 'G shape pointing down' },
+    { id: 'r', name: 'R', visual: '🤞', description: 'Crossed index and middle fingers' },
+    { id: 's', name: 'S', visual: '✊', description: 'Fist with thumb over fingers' },
+    { id: 't', name: 'T', visual: '👊', description: 'Thumb between index and middle' },
+    { id: 'u', name: 'U', visual: '✌️', description: 'Index and middle together, pointing up' },
+    { id: 'v', name: 'V', visual: '✌️', description: 'Index and middle spread in V' },
+    { id: 'w', name: 'W', visual: '🤟', description: 'Three fingers extended (index, middle, ring)' },
+    { id: 'x', name: 'X', visual: '☝️', description: 'Index finger bent like hook' },
+    { id: 'y', name: 'Y', visual: '🤙', description: 'Thumb and pinky extended (hang loose)' },
+    { id: 'z', name: 'Z', visual: '☝️', description: 'Index traces Z in the air' }
+];
+
+const fslNumberSigns = [
+    { id: '0', name: '0', visual: '👌', description: 'O shape with thumb and fingers' },
+    { id: '1', name: '1', visual: '☝️', description: 'Index finger pointing up' },
+    { id: '2', name: '2', visual: '✌️', description: 'Index and middle fingers up' },
+    { id: '3', name: '3', visual: '🤟', description: 'Thumb, index, middle up' },
+    { id: '4', name: '4', visual: '🖖', description: 'Four fingers extended' },
+    { id: '5', name: '5', visual: '🖐️', description: 'All five fingers spread open' },
+    { id: '6', name: '6', visual: '🤙', description: 'Thumb and pinky touch, others folded' },
+    { id: '7', name: '7', visual: '🤘', description: 'Ring and pinky touch thumb' },
+    { id: '8', name: '8', visual: '🤞', description: 'Middle and ring touch thumb' },
+    { id: '9', name: '9', visual: '👌', description: 'Index touches thumb, four fingers up' },
+    { id: '10', name: '10', visual: '👊', description: 'Fist with slight shake' }
+];
+
+const fslGreetingSigns = [
+    { id: 'hello', name: 'Kumusta (Hello)', visual: '👋', description: 'Wave hand or touch forehead then move forward' },
+    { id: 'goodbye', name: 'Paalam (Goodbye)', visual: '👋', description: 'Wave hand back and forth' },
+    { id: 'please', name: 'Paki (Please)', visual: '🤚', description: 'Hand flat, circular motion on chest' },
+    { id: 'thankyou', name: 'Salamat (Thank You)', visual: '😊', description: 'Hand moves from lips/chin forward' },
+    { id: 'sorry', name: 'Pasensya (Sorry)', visual: '✊', description: 'Fist circles on chest, apologetic' },
+    { id: 'yes', name: 'Oo (Yes)', visual: '👍', description: 'Nod fist or head movement' },
+    { id: 'no', name: 'Hindi (No)', visual: '☝️', description: 'Shake head or finger wag' },
+    { id: 'help', name: 'Tulong (Help)', visual: '🆘', description: 'One hand supports/lifts the other' },
+    { id: 'welcome', name: 'Walang Anuman (Welcome)', visual: '🤗', description: 'Open arms gesture' },
+    { id: 'goodmorning', name: 'Magandang Umaga', visual: '🌅', description: 'Sign for "good" + "morning"' }
+];
+
+const fslCommonSigns = [
+    { id: 'eat', name: 'Kain (Eat)', visual: '🍽️', description: 'Fingers to mouth repeatedly' },
+    { id: 'drink', name: 'Inom (Drink)', visual: '🥤', description: 'Hand mimics holding cup to mouth' },
+    { id: 'sleep', name: 'Tulog (Sleep)', visual: '😴', description: 'Hand closes near face/cheek' },
+    { id: 'home', name: 'Bahay (Home)', visual: '🏠', description: 'Hands form roof shape' },
+    { id: 'work', name: 'Trabaho (Work)', visual: '💼', description: 'Fists tap or move in working motion' },
+    { id: 'school', name: 'Eskwela (School)', visual: '🏫', description: 'Hands clap or book shape' },
+    { id: 'friend', name: 'Kaibigan (Friend)', visual: '👥', description: 'Hook fingers together or shake' },
+    { id: 'family', name: 'Pamilya (Family)', visual: '👨‍👩‍👧‍👦', description: 'F-hands or arms encircle' },
+    { id: 'happy', name: 'Masaya (Happy)', visual: '😊', description: 'Smile gesture, hands brush chest up' },
+    { id: 'sad', name: 'Malungkot (Sad)', visual: '😢', description: 'Hands slide down face' },
+    { id: 'love', name: 'Mahal (Love)', visual: '❤️', description: 'Hands cross over heart' },
+    { id: 'beautiful', name: 'Maganda (Beautiful)', visual: '✨', description: 'Hand circles face appreciatively' }
+];
+
+// ===================================
+// ORIGINAL ASL DATA (Keep your existing data)
+// ===================================
+
+const aslAlphabetSigns = [
     { id: 'a', name: 'A', visual: '✊', description: 'Closed fist with thumb to the side' },
     { id: 'b', name: 'B', visual: '🖐️', description: 'Open hand, fingers together, thumb across palm' },
     { id: 'c', name: 'C', visual: '👌', description: 'Curved hand forming a C shape' },
@@ -323,7 +413,7 @@ const alphabetSigns = [
     { id: 'z', name: 'Z', visual: '☝️', description: 'Index finger draws Z in air' }
 ];
 
-const numberSigns = [
+const aslNumberSigns = [
     { id: '0', name: '0', visual: '👌', description: 'Circle with thumb and index' },
     { id: '1', name: '1', visual: '☝️', description: 'Index finger up' },
     { id: '2', name: '2', visual: '✌️', description: 'Index and middle up' },
@@ -337,7 +427,7 @@ const numberSigns = [
     { id: '10', name: '10', visual: '👊', description: 'Shake fist or show thumb (A + wiggle)' }
 ];
 
-const greetingSigns = [
+const aslGreetingSigns = [
     { id: 'hello', name: 'Hello', visual: '👋', description: 'Wave hand side to side' },
     { id: 'goodbye', name: 'Goodbye', visual: '👋', description: 'Wave hand up and down' },
     { id: 'please', name: 'Please', visual: '🤚', description: 'Rub hand in circle on chest' },
@@ -348,7 +438,7 @@ const greetingSigns = [
     { id: 'help', name: 'Help', visual: '🆘', description: 'One hand lifts the other' }
 ];
 
-const commonSigns = [
+const aslCommonSigns = [
     { id: 'eat', name: 'Eat', visual: '🍽️', description: 'Fingers to mouth repeatedly' },
     { id: 'drink', name: 'Drink', visual: '🥤', description: 'C hand to mouth like holding cup' },
     { id: 'sleep', name: 'Sleep', visual: '😴', description: 'Hand closes near cheek' },
@@ -361,73 +451,181 @@ const commonSigns = [
     { id: 'sad', name: 'Sad', visual: '😢', description: 'Hands slide down face' }
 ];
 
-const signCategories = {
-    alphabet: alphabetSigns,
-    numbers: numberSigns,
-    greetings: greetingSigns,
-    common: commonSigns
+// ===================================
+// LANGUAGE-SPECIFIC SIGN CATEGORIES
+// ===================================
+
+const languageData = {
+    asl: {
+        alphabet: aslAlphabetSigns,
+        numbers: aslNumberSigns,
+        greetings: aslGreetingSigns,
+        common: aslCommonSigns,
+        fullName: 'American Sign Language',
+        shortName: 'ASL',
+        flag: '🇺🇸'
+    },
+    fsl: {
+        alphabet: fslAlphabetSigns,
+        numbers: fslNumberSigns,
+        greetings: fslGreetingSigns,
+        common: fslCommonSigns,
+        fullName: 'Filipino Sign Language',
+        shortName: 'FSL',
+        flag: '🇵🇭'
+    }
 };
 
-// ===================================
-// GLOBAL STATE VARIABLES
-// ===================================
-
-let currentSection = 'home';
-let currentCategory = null;
-let currentSignIndex = 0;
-let currentQuiz = null;
-let quizScore = 0;
-let currentQuestionIndex = 0;
+// Update the global signCategories to use current language
+let signCategories = languageData[currentLanguage];
 
 // ===================================
-// LOCAL STORAGE FUNCTIONS
+// LANGUAGE SWITCHING FUNCTION
 // ===================================
 
+function switchLanguage(language) {
+    currentLanguage = language;
+    signCategories = languageData[language];
+    
+    // Save language preference
+    localStorage.setItem('selectedLanguage', language);
+    
+    // Update UI text
+    updateLanguageUI();
+    
+    // Reset current lesson/quiz if active
+    if (currentCategory) {
+        hideLesson();
+    }
+    
+    // Update progress display
+    updateCategoryProgress();
+    updateHomeStats();
+    
+    // Show notification
+    const langName = languageData[language].fullName;
+    alert(`✅ Language changed to ${langName}!`);
+}
+
+function updateLanguageUI() {
+    const lang = languageData[currentLanguage];
+    
+    // Update welcome text
+    const welcomeText = document.getElementById('welcomeText');
+    if (welcomeText) {
+        welcomeText.textContent = `Learn the basics of ${lang.fullName} (${lang.shortName}) through interactive lessons and fun games.`;
+    }
+    
+    // Update rhythm game title
+    const rhythmTitle = document.getElementById('rhythmGameTitle');
+    if (rhythmTitle) {
+        rhythmTitle.textContent = `🎵 ${lang.shortName} Rhythm Game`;
+    }
+    
+    // Update category descriptions
+    updateCategoryDescriptions();
+}
+
+function updateCategoryDescriptions() {
+    const lang = languageData[currentLanguage];
+    const shortName = lang.shortName;
+    
+    // Update lesson category cards
+    const categories = document.querySelectorAll('.category-card');
+    if (categories.length >= 4) {
+        categories[0].querySelector('p').textContent = `Learn A-Z in ${shortName}`;
+        categories[1].querySelector('p').textContent = `Learn 0-10 in ${shortName}`;
+        categories[2].querySelector('p').textContent = `Common greetings`;
+        categories[3].querySelector('p').textContent = `Everyday words`;
+    }
+}
+
+// ===================================
+// LOAD SAVED LANGUAGE ON STARTUP
+// ===================================
+
+window.addEventListener('DOMContentLoaded', function() {
+    // Load saved language preference
+    const savedLanguage = localStorage.getItem('selectedLanguage');
+    if (savedLanguage && languageData[savedLanguage]) {
+        currentLanguage = savedLanguage;
+        signCategories = languageData[currentLanguage];
+        
+        // Update select dropdown
+        const select = document.getElementById('languageSelect');
+        if (select) {
+            select.value = savedLanguage;
+        }
+        
+        updateLanguageUI();
+    }
+});
+
+// ===================================
+// UPDATE PROGRESS SYSTEM FOR MULTI-LANGUAGE
+// ===================================
+
+// Override getProgress to handle multiple languages
+const _originalGetProgress = getProgress;
 function getProgress() {
     const defaultProgress = {
-        learned: {
-            alphabet: [],
-            numbers: [],
-            greetings: [],
-            common: []
+        asl: {
+            learned: { alphabet: [], numbers: [], greetings: [], common: [] },
+            totalScore: 0,
+            quizzesTaken: 0,
+            achievements: []
         },
-        totalScore: 0,
-        quizzesTaken: 0,
-        achievements: []
+        fsl: {
+            learned: { alphabet: [], numbers: [], greetings: [], common: [] },
+            totalScore: 0,
+            quizzesTaken: 0,
+            achievements: []
+        }
     };
     
     const saved = localStorage.getItem('signLanguageProgress');
-    return saved ? JSON.parse(saved) : defaultProgress;
+    if (!saved) return defaultProgress;
+    
+    const progress = JSON.parse(saved);
+    
+    // Migrate old single-language progress to new format
+    if (!progress.asl && !progress.fsl) {
+        return {
+            asl: progress,
+            fsl: defaultProgress.fsl
+        };
+    }
+    
+    return progress;
 }
 
-function saveProgress(progress) {
-    localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
-}
-
+// Override markSignLearned for multi-language
 function markSignLearned(category, signId) {
     const progress = getProgress();
-    if (!progress.learned[category].includes(signId)) {
-        progress.learned[category].push(signId);
+    if (!progress[currentLanguage].learned[category].includes(signId)) {
+        progress[currentLanguage].learned[category].push(signId);
         saveProgress(progress);
     }
 }
 
+// Override updateQuizStats for multi-language
 function updateQuizStats(score, total) {
     const progress = getProgress();
-    progress.totalScore += score;
-    progress.quizzesTaken += 1;
-    checkAchievements(progress);
+    progress[currentLanguage].totalScore += score;
+    progress[currentLanguage].quizzesTaken += 1;
+    checkAchievements(progress[currentLanguage]);
     saveProgress(progress);
 }
 
-function resetProgress() {
-    if (confirm('Are you sure you want to reset all your progress? This cannot be undone.')) {
-        localStorage.removeItem('signLanguageProgress');
-        updateHomeStats();
-        updateProgressDisplay();
-        updateCategoryProgress();
-        alert('All progress has been reset!');
-    }
+// Override updateHomeStats for multi-language
+function updateHomeStats() {
+    const progress = getProgress();
+    const langProgress = progress[currentLanguage];
+    const totalLearned = Object.values(langProgress.learned).reduce((sum, arr) => sum + arr.length, 0);
+    
+    document.getElementById('totalLearned').textContent = totalLearned;
+    document.getElementById('totalScore').textContent = langProgress.totalScore;
+    document.getElementById('quizzesTaken').textContent = langProgress.quizzesTaken;
 }
 
 // ===================================

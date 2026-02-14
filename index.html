@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesturix</title>
     <title>Sign Language Learning Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+<!-- ADD THIS RIGHT AFTER THE HEADER, BEFORE THE NAVIGATION -->
+<!-- Language Selector -->
+<div class="language-selector">
+    <label for="languageSelect">Choose Language:</label>
+    <select id="languageSelect" onchange="switchLanguage(this.value)">
+        <option value="asl">🇺🇸 American Sign Language (ASL)</option>
+        <option value="fsl">🇵🇭 Filipino Sign Language (FSL)</option>
+    </select>
+</div>
+
 <body>
     <!-- LAUNCH SLIDE -->
     <div id="launchSlide" class="launch-slide">
@@ -14,7 +25,7 @@
                 <div class="hand-icon">🤟</div>
             </div>
             <h1 class="launch-title">Sign Language Learner</h1>
-            <p class="launch-subtitle">Learn ASL at your own pace</p>
+            <p class="launch-subtitle">Learn Sign Language at your own pace</p>
             <button class="launch-button" onclick="showLoginPage()">
                 Click to Enter ✨
             </button>
@@ -26,7 +37,7 @@
         <div class="login-container">
             <div class="login-header">
                 <div class="login-icon">🤟</div>
-                <h2>Welcome to Sign Language Learner</h2>
+                <h2>Welcome to Gesturix</h2>
                 <p id="loginSubtext">Please enter your information to get started</p>
             </div>
             
@@ -143,7 +154,7 @@
         
         <!-- Header Section -->
         <header>
-            <h1>🤟 Sign Language Learner</h1>
+            <h1>🤟 Gesturix</h1>
             <p class="subtitle">Learn basic sign language at your own pace</p>
             <div id="userInfo" class="user-info-display"></div>
         </header>
@@ -159,8 +170,8 @@
         <!-- Home Section -->
         <section id="home" class="section active">
             <div class="welcome-card">
-                <h2>Welcome to Sign Language Learning!</h2>
-                <p>Learn the basics of American Sign Language (ASL) through interactive lessons and fun games.</p>
+                <h2>Welcome to Gesturix: Sign Language Learning!</h2>
+                <p id="welcomeText">Learn the basics of American Sign Language (ASL) through interactive lessons and fun games.</p>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -298,7 +309,7 @@
             <!-- Rhythm Game View -->
             <div id="rhythmGame" class="rhythm-game hidden">
                 <div class="rhythm-game-header">
-                    <h2>🎵 ASL Rhythm Game</h2>
+                    <h2 id="rhythmGameTitle">🎵 ASL Rhythm Game</h2>
                     <div class="rhythm-stats">
                         <span class="rhythm-stat">Score: <strong id="rhythmScore">0</strong></span>
                         <span class="rhythm-stat">Combo: <strong id="rhythmCombo">0</strong></span>
