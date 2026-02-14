@@ -144,6 +144,23 @@ body {
     width: 90%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.6s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: auto;
+}
+
+.login-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.login-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.login-container::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
 }
 
 .login-header {
