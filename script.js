@@ -3,7 +3,7 @@
    REPLACE THESE WITH YOUR ACTUAL VALUES!
    =================================== */
 
-const SUPABASE_URL = 'https://oiepfirmlsbalcmpwbyk.supabase.coE';  // e.g., https://xxxxx.supabase.co
+const SUPABASE_URL = 'https://oiepfirmlsbalcmpwbyk.supabase.co';  // e.g., https://xxxxx.supabase.co
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBmaXJtbHNiYWxjbXB3YnlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNjY1MjEsImV4cCI6MjA4NjY0MjUyMX0.s1hrIKPc47WNrc4f6MGmsZL12h36DDoFuAMT7dUXNjs';  // Get from Supabase Settings > API
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
