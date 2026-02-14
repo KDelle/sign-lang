@@ -7,8 +7,8 @@
     <title>Sign Language Learning Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<!-- ADD THIS RIGHT AFTER THE HEADER, BEFORE THE NAVIGATION -->
-<!-- Language Selector -->
+
+
 <div class="language-selector">
     <label for="languageSelect">Choose Language:</label>
     <select id="languageSelect" onchange="switchLanguage(this.value)">
@@ -18,7 +18,7 @@
 </div>
 
 <body>
-    <!-- LAUNCH SLIDE -->
+    
     <div id="launchSlide" class="launch-slide">
         <div class="launch-content">
             <div class="launch-animation">
@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <!-- LOGIN PAGE WITH PASSWORD -->
+    
     <div id="loginPage" class="login-page hidden">
         <div class="login-container">
             <div class="login-header">
@@ -41,13 +41,13 @@
                 <p id="loginSubtext">Please enter your information to get started</p>
             </div>
             
-            <!-- Toggle between New User and Returning User -->
+            
             <div class="login-toggle">
                 <button class="toggle-btn active" id="newUserBtn" onclick="showNewUserForm()">New User</button>
                 <button class="toggle-btn" id="returningUserBtn" onclick="showReturningUserForm()">Returning User</button>
             </div>
 
-            <!-- NEW USER FORM -->
+            
             <form id="newUserForm" class="login-form" onsubmit="handleNewUserSignup(event)">
                 <div class="form-group">
                     <label for="newUserName">Full Name</label>
@@ -112,7 +112,7 @@
                 </button>
             </form>
 
-            <!-- RETURNING USER FORM -->
+            
             <form id="returningUserForm" class="login-form hidden" onsubmit="handleReturningUserLogin(event)">
                 <div class="form-group">
                     <label for="returningUserName">Name</label>
@@ -125,7 +125,7 @@
                         list="userNamesList"
                     >
                     <datalist id="userNamesList">
-                        <!-- Will be populated by JavaScript with existing users -->
+                        
                     </datalist>
                 </div>
 
@@ -149,17 +149,17 @@
         </div>
     </div>
 
-    <!-- Main Container -->
+    
     <div class="container" id="mainApp">
         
-        <!-- Header Section -->
+        
         <header>
             <h1>🤟 Gesturix</h1>
             <p class="subtitle">Learn basic sign language at your own pace</p>
             <div id="userInfo" class="user-info-display"></div>
         </header>
 
-        <!-- Navigation Menu -->
+        
         <nav class="main-nav" id="mainNav">
             <button class="nav-btn active" data-section="home">🏠 Home</button>
             <button class="nav-btn" data-section="lessons">📚 Lessons</button>
@@ -167,7 +167,7 @@
             <button class="nav-btn" data-section="progress">📊 Progress</button>
         </nav>
 
-        <!-- Home Section -->
+        
         <section id="home" class="section active">
             <div class="welcome-card">
                 <h2>Welcome to Gesturix: Sign Language Learning!</h2>
@@ -194,7 +194,7 @@
             </div>
         </section>
 
-        <!-- Lessons Section -->
+        
         <section id="lessons" class="section">
             <h2>Choose a Lesson Category</h2>
             
@@ -236,7 +236,7 @@
                 </div>
             </div>
 
-            <!-- Lesson Detail View -->
+            
             <div id="lessonDetail" class="lesson-detail hidden">
                 <button class="btn-back" onclick="hideLesson()">← Back to Categories</button>
                 <h2 id="lessonTitle"></h2>
@@ -261,9 +261,9 @@
             </div>
         </section>
 
-        <!-- Practice Section -->
+        
         <section id="practice" class="section">
-            <!-- Quiz View -->
+            
             <div id="quizView" class="quiz-view">
                 <div class="quiz-header">
                     <h2>Quiz: <span id="quizCategory"></span></h2>
@@ -280,7 +280,7 @@
                     </div>
 
                     <div class="options-grid" id="optionsGrid">
-                        <!-- Options will be inserted here by JavaScript -->
+                        
                     </div>
                 </div>
 
@@ -289,7 +289,7 @@
                 <button class="btn-back" onclick="exitQuiz()">Exit Quiz</button>
             </div>
 
-            <!-- Quiz Results -->
+            
             <div id="quizResults" class="quiz-results hidden">
                 <h2>🎉 Quiz Complete!</h2>
                 <div class="results-card">
@@ -306,7 +306,7 @@
                 </div>
             </div>
 
-            <!-- Rhythm Game View -->
+            
             <div id="rhythmGame" class="rhythm-game hidden">
                 <div class="rhythm-game-header">
                     <h2 id="rhythmGameTitle">🎵 ASL Rhythm Game</h2>
@@ -326,7 +326,7 @@
                 <div class="rhythm-feedback" id="rhythmFeedback"></div>
 
                 <div class="rhythm-options" id="rhythmOptions">
-                    <!-- Options will be inserted here by JavaScript -->
+                    
                 </div>
 
                 <div class="rhythm-controls">
@@ -334,7 +334,7 @@
                 </div>
             </div>
 
-            <!-- Rhythm Game Results -->
+            
             <div id="rhythmResults" class="rhythm-results hidden">
                 <h2>🎉 Game Over!</h2>
                 <div class="results-card">
@@ -354,7 +354,7 @@
                 </div>
             </div>
 
-            <!-- Practice Home -->
+            
             <div id="practiceHome" class="practice-home">
                 <h2>Practice Your Skills</h2>
                 <p>Choose how you want to practice today!</p>
@@ -387,7 +387,7 @@
             </div>
         </section>
 
-        <!-- Progress Section -->
+        
         <section id="progress" class="section">
             <h2>Your Learning Progress</h2>
             
@@ -408,7 +408,7 @@
                 <div class="achievements">
                     <h3>🏆 Achievements</h3>
                     <div id="achievementsList">
-                        <!-- Achievements will be inserted here -->
+                       
                     </div>
                 </div>
             </div>
@@ -416,7 +416,7 @@
             <div class="category-progress">
                 <h3>Progress by Category</h3>
                 <div id="categoryProgressList">
-                    <!-- Progress bars will be inserted here -->
+                    
                 </div>
             </div>
 
@@ -425,7 +425,11 @@
 
     </div>
 
-    <!-- JavaScript -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Your script -->
     <script src="script.js"></script>
 </body>
 </html>
+
