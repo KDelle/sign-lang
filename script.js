@@ -1,22 +1,14 @@
 /* ===================================
    SUPABASE CONFIGURATION
-   REPLACE THESE WITH YOUR ACTUAL VALUES!
    =================================== */
-
-const SUPABASE_URL = 'https://oiepfirmlsbalcmpwbyk.supabase.co';  // e.g., https://xxxxx.supabase.co
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBmaXJtbHNiYWxjbXB3YnlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNjY1MjEsImV4cCI6MjA4NjY0MjUyMX0.s1hrIKPc47WNrc4f6MGmsZL12h36DDoFuAMT7dUXNjs';  // Get from Supabase Settings > API
+const SUPABASE_URL = 'https://oiepfirmlsbalcmpwbyk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBmaXJtbHNiYWxjbXB3YnlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNjY1MjEsImV4cCI6MjA4NjY0MjUyMX0.s1hrIKPc47WNrc4f6MGmsZL12h36DDoFuAMT7dUXNjs';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ===================================
-   SIGN LANGUAGE LEARNING GAME - COMPLETE
-   With Supabase Cloud Database Integration
+   AUTHENTICATION FUNCTIONS
    =================================== */
 
-// ===================================
-// USER DATABASE & AUTHENTICATION (CLOUD)
-// ===================================
-
-// Hash password (simple hash for demo)
 function hashPassword(password) {
     let hash = 0;
     for (let i = 0; i < password.length; i++) {
@@ -27,7 +19,6 @@ function hashPassword(password) {
     return hash.toString();
 }
 
-// Check if user is already logged in
 async function checkUserSession() {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
@@ -38,11 +29,6 @@ async function checkUserSession() {
     return false;
 }
 
-// ===================================
-// LOGIN PAGE FUNCTIONS
-// ===================================
-
-// Show login page (after launch slide)
 function showLoginPage() {
     const launchSlide = document.getElementById('launchSlide');
     const loginPage = document.getElementById('loginPage');
@@ -61,7 +47,6 @@ function showLoginPage() {
     mainApp.classList.add('hidden');
 }
 
-// Toggle between new user and returning user forms
 function showNewUserForm() {
     document.getElementById('newUserForm').classList.remove('hidden');
     document.getElementById('returningUserForm').classList.add('hidden');
@@ -79,7 +64,6 @@ function showReturningUserForm() {
     populateUserNamesList();
 }
 
-// Populate datalist with existing user names from Supabase
 async function populateUserNamesList() {
     const datalist = document.getElementById('userNamesList');
     datalist.innerHTML = '';
@@ -102,10 +86,6 @@ async function populateUserNamesList() {
     }
 }
 
-// ===================================
-// NEW USER SIGNUP (CLOUD)
-// ===================================
-
 async function handleNewUserSignup(event) {
     event.preventDefault();
     
@@ -121,7 +101,6 @@ async function handleNewUserSignup(event) {
     }
     
     try {
-        // Check if user already exists
         const { data: existingUser } = await supabase
             .from('users')
             .select('id')
@@ -133,7 +112,6 @@ async function handleNewUserSignup(event) {
             return;
         }
         
-        // Create new user in Supabase
         const { data: newUser, error } = await supabase
             .from('users')
             .insert([
@@ -149,7 +127,6 @@ async function handleNewUserSignup(event) {
         
         if (error) throw error;
         
-        // Save user session
         const userData = {
             id: newUser.id,
             name: name,
@@ -167,10 +144,6 @@ async function handleNewUserSignup(event) {
     }
 }
 
-// ===================================
-// RETURNING USER LOGIN (CLOUD)
-// ===================================
-
 async function handleReturningUserLogin(event) {
     event.preventDefault();
     
@@ -179,7 +152,6 @@ async function handleReturningUserLogin(event) {
     const errorDiv = document.getElementById('loginError');
     
     try {
-        // Find user in Supabase
         const { data: user, error } = await supabase
             .from('users')
             .select('*')
@@ -192,14 +164,12 @@ async function handleReturningUserLogin(event) {
             return;
         }
         
-        // Verify password
         if (user.password !== hashPassword(password)) {
             errorDiv.textContent = 'Incorrect password. Please try again.';
             errorDiv.classList.add('show');
             return;
         }
         
-        // Update last login
         await supabase
             .from('users')
             .update({ last_login: new Date().toISOString() })
@@ -207,7 +177,6 @@ async function handleReturningUserLogin(event) {
         
         errorDiv.classList.remove('show');
         
-        // Save user session
         const userData = {
             id: user.id,
             name: user.name,
@@ -225,10 +194,6 @@ async function handleReturningUserLogin(event) {
     }
 }
 
-// ===================================
-// SHOW MAIN APP
-// ===================================
-
 async function showMainApp(userData) {
     const loginPage = document.getElementById('loginPage');
     const mainApp = document.getElementById('mainApp');
@@ -242,7 +207,6 @@ async function showMainApp(userData) {
     updateCategoryProgress();
 }
 
-// Display user info in header with logout button
 function displayUserInfo(userData) {
     const userInfoDiv = document.getElementById('userInfo');
     userInfoDiv.innerHTML = `
@@ -254,13 +218,8 @@ function displayUserInfo(userData) {
     `;
 }
 
-// ===================================
-// USER PROGRESS MANAGEMENT (CLOUD)
-// ===================================
-
 async function loadUserProgress(userId) {
     try {
-        // Load progress from Supabase
         const { data: progressData, error } = await supabase
             .from('user_progress')
             .select('*')
@@ -268,7 +227,6 @@ async function loadUserProgress(userId) {
         
         if (error) throw error;
         
-        // Convert to local format
         const progress = {
             asl: {
                 learned: { alphabet: [], numbers: [], greetings: [], common: [] },
@@ -296,12 +254,10 @@ async function loadUserProgress(userId) {
             }
         });
         
-        // Save to localStorage for quick access
         localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
         
     } catch (error) {
         console.error('Error loading progress:', error);
-        // Initialize empty progress if load fails
         const emptyProgress = {
             asl: {
                 learned: { alphabet: [], numbers: [], greetings: [], common: [] },
@@ -328,7 +284,6 @@ async function saveUserProgress() {
     const progress = getProgress();
     
     try {
-        // Save each language's progress to Supabase
         for (const lang of ['asl', 'fsl']) {
             const langProgress = progress[lang];
             
@@ -357,10 +312,6 @@ async function saveUserProgress() {
     }
 }
 
-// ===================================
-// LOGOUT FUNCTION
-// ===================================
-
 async function logout() {
     if (confirm('Are you sure you want to logout?')) {
         await saveUserProgress();
@@ -369,10 +320,6 @@ async function logout() {
         window.location.reload();
     }
 }
-
-// ===================================
-// PAGE LOAD CHECK
-// ===================================
 
 window.addEventListener('DOMContentLoaded', async function() {
     if (await checkUserSession()) {
@@ -385,19 +332,14 @@ window.addEventListener('beforeunload', async function() {
     await saveUserProgress();
 });
 
-// ===================================
-// AUTO-SAVE PROGRESS EVERY 30 SECONDS
-// ===================================
-
 setInterval(async () => {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
         await saveUserProgress();
     }
-}, 30000); // 30 seconds
+}, 30000);
 
 /* ===================================
-   REST OF YOUR EXISTING CODE GOES HERE
-   (Sign language data, game logic, etc.)
-   Keep everything else the same!
+   YOUR EXISTING CODE CONTINUES HERE
+   (Keep ALL your sign language data, game logic, etc.)
    =================================== */
