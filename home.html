@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        (function(){
+            // Theme system is now handled by theme-manager.js
+            var t=localStorage.getItem('gesturix-theme');
+            document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Gesturix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Theme System -->
+    <link rel="stylesheet" href="theme-styles.css">
+    <link rel="stylesheet" href="animations.css">
+    <script src="theme-manager.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hide scrollbar for all elements */
+        html {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        #achievementsList::-webkit-scrollbar {
+            display: none;
+        }
+        #mainNav::-webkit-scrollbar {
+            display: none;
+        }
+        /* Dark theme (default) - force dark when data-theme="dark" */
+        [data-theme="dark"] body,
+        [data-theme="dark"] #mainApp,
+        html:not([data-theme="light"]) body,
+        html:not([data-theme="light"]) #mainApp { background: #000035 !important; color: #e5e5e5 !important; }
+        [data-theme="dark"] #mainApp,
+        html:not([data-theme="light"]) #mainApp { background-color: #000035 !important; }
+        [data-theme="dark"] header,
+        html:not([data-theme="light"]) header { background: rgba(0,0,53,0.9) !important; border-color: #1a1a7e !important; }
+        /* Light theme overrides when data-theme="light" */
+        [data-theme="light"] body,
+        [data-theme="light"] #mainApp { background: #f0f8fa !important; color: #2c5f6f !important; }
+        [data-theme="light"] header { background: rgba(255,255,255,0.95) !important; border-color: #7BBDC9 !important; }
+        /* only headings should be forced dark; buttons and other white text need custom handling */
+        [data-theme="light"] h1, [data-theme="light"] h2, [data-theme="light"] h3 { color: #2c5f6f !important; }
+        [data-theme="light"] .text-\[\#a3a3a3\], [data-theme="light"] .text-\[\#737373\] { color: #5a8a9a !important; }
+        [data-theme="light"] .bg-\[\#171717\], [data-theme="light"] .bg-\[\#0a0a0a\] { background-color: #ffffff !important; }
+        [data-theme="light"] .border-\[\#262626\] { border-color: #7BBDC9 !important; }
+        [data-theme="light"] button.border-\[\#262626\], [data-theme="light"] select.border-\[\#262626\] { border-color: #95C0C3 !important; }
+        [data-theme="light"] .nav-btn:hover, [data-theme="light"] #themeToggle:hover, [data-theme="light"] #logoutBtn:hover { background: #e8f4f8 !important; border-color: #4798C2 !important; color: #2c5f6f !important; }
+        [data-theme="light"] .nav-btn.active { background: #4798C2 !important; color: #ffffff !important; }
+        [data-theme="light"] select#languageSelect { background: #ffffff !important; color: #2c5f6f !important; }
+        [data-theme="light"] .category-card, [data-theme="light"] [class*="bg-[#171717]"] { background-color: #ffffff !important; border-color: #7BBDC9 !important; }
+        [data-theme="light"] .category-card:hover { background-color: #f0f8fa !important; border-color: #4798C2 !important; }
+        [data-theme="light"] .bg-\[\#262626\] { background-color: #e8f4f8 !important; }
+        [data-theme="light"] .text-\[\#e5e5e5\] { color: #2c5f6f !important; }
+        /* Ensure home stats numbers are readable in light mode */
+        [data-theme="light"] #totalLearned,
+        [data-theme="light"] #totalScore,
+        [data-theme="light"] #quizzesTaken { color: #4798C2 !important; font-weight: 700; }
+        [data-theme="light"] .hover\:bg-\[\#1a1a1a\]:hover { background-color: #f0f0f0 !important; }
+        [data-theme="light"] .hover\:text-\[\#e5e5e5\]:hover { color: #171717 !important; }
+        /* light theme overrides for progress section */
+        [data-theme="light"] .progress-card-main,
+        [data-theme="light"] .category-progress,
+        [data-theme="light"] .achievements,
+        [data-theme="light"] .rhythm-stats-grid {
+            background: #ffffff !important;
+            border-color: #7BBDC9 !important;
+            color: #2c5f6f !important;
+        }
+        /* inner achievement item colors when light theme is active */
+        [data-theme="light"] .achievements .achievement-item {
+            background: rgba(123,189,201,0.1) !important;
+            border-color: rgba(71,152,194,0.2) !important;
+        }
+        [data-theme="light"] .achievements .achievement-text h4,
+        [data-theme="light"] .achievements .achievement-text p {
+            color: #2c5f6f !important;
+            opacity: 0.9 !important;
+        }
+        /* rhythm game cards should also invert in light mode */
+        [data-theme="light"] .rhythm-stats-grid {
+            background: #ffffff !important;
+        }
+        [data-theme="light"] .rhythm-stat-card {
+            background: #f0f8fa !important;
+            border: 1px solid #7BBDC9 !important;
+        }
+        [data-theme="light"] .rhythm-stat-label {
+            color: #5a8a9a !important;
+        }
+        [data-theme="light"] .rhythm-stat-value {
+            color: #4798C2 !important;
+        }
+        /* Light mode for quiz and rhythm choices */
+        [data-theme="light"] #practice #quizView #optionsGrid button,
+        [data-theme="light"] #practice #quizView #optionsGrid .option-btn,
+        [data-theme="light"] #practice #rhythmGame #rhythmOptions button,
+        [data-theme="light"] #practice #rhythmGame #rhythmOptions .rhythm-option-btn {
+            background: #ffffff !important;
+            color: #2c5f6f !important;
+            border-color: #7BBDC9 !important;
+        }
+        [data-theme="light"] #practice #quizView #optionsGrid button:hover,
+        [data-theme="light"] #practice #quizView #optionsGrid .option-btn:hover,
+        [data-theme="light"] #practice #rhythmGame #rhythmOptions button:hover,
+        [data-theme="light"] #practice #rhythmGame #rhythmOptions .rhythm-option-btn:hover {
+            background: #f0f8fa !important;
+            color: #2c5f6f !important;
+            border-color: #4798C2 !important;
+        }
+        [data-theme="light"] #practice #quizView #optionsGrid .option-btn.correct,
+        [data-theme="light"] #practice #rhythmGame #rhythmOptions .rhythm-option-btn.correct {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            border-color: #10b981 !important;
+        }
+        [data-theme="light"] #practice #quizView #optionsGrid .option-btn.incorrect,
+        [data-theme="light"] #practice #rhythmGame #rhythmOptions .rhythm-option-btn.incorrect {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border-color: #ef4444 !important;
+        }
+        /* Light mode feedback colors */
+        [data-theme="light"] #feedback.correct {
+            background: #d1fae5 !important;
+            color: #065f46 !important;
+            border: 1px solid #10b981 !important;
+        }
+        [data-theme="light"] #feedback.incorrect {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+            border: 1px solid #ef4444 !important;
+        }
+        /* ensure critical buttons keep white text on red background in light mode */
+        [data-theme="light"] button.bg-\[\#dc2626\],
+        [data-theme="light"] button.bg-\[\#dc2626\] i {
+            color: #ffffff !important;
+        }
+        [data-theme="light"] .progress-card-main h3,
+        [data-theme="light"] .category-progress h3 {
+            color: #2c5f6f !important;
+        }
+        [data-theme="light"] .progress-item-name {
+            color: #2c5f6f !important;
+        }
+        /* progress percentages and accents stay blue */
+        [data-theme="light"] .progress-item-percentage,
+        [data-theme="light"] .progress-text {
+            color: #4798C2 !important;
+        }
+        [data-theme="light"] .rhythm-stats-grid {
+            background: #f0f8fa !important;
+            border-color: #7BBDC9 !important;
+        }
+    </style>
+    <style>
+        /* Responsive tweaks for Rhythm Game Performance/Stats cards */
+        @media (max-width: 640px) {
+            /* Ensure stat triplets become a flexible grid if present */
+            .rhythm-stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 0.5rem;
+            }
+            .rhythm-stat-card { min-height: 64px; }
+        }
+    </style>
+</head>
+<body class="font-sans bg-[#000035] text-[#e5e5e5] leading-relaxed min-h-screen antialiased overflow-x-hidden m-0 p-0" style="scrollbar-width: none; -ms-overflow-style: none; visibility:hidden;">
+    <script>
+        // immediately restore last section and nav state before showing page
+        (function() {
+            const saved = localStorage.getItem('currentSection') || 'home';
+            function applySection() {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                const sect = document.getElementById(saved) || document.getElementById('home');
+                if (sect) sect.classList.add('active');
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                const btn = document.querySelector('.nav-btn[data-section="' + saved + '"]');
+                if (btn) btn.classList.add('active');
+                document.body.style.visibility = '';
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applySection);
+            } else {
+                applySection();
+            }
+        })();
+    </script>
+    <div class="w-full m-0 bg-[#000035] rounded-none shadow-none p-0 min-h-screen overflow-x-hidden" id="mainApp">
+        <header class="border-b border-[#1a1a7e] py-2.5 md:py-3.5 sticky top-0 z-50 backdrop-blur-[10px] bg-[rgba(0,0,53,0.9)] w-full">
+            <div class="w-full px-4 md:px-8 flex justify-between items-center gap-2 md:gap-3 flex-nowrap">
+                <div class="flex items-center gap-1.5 md:gap-3 min-w-0 flex-shrink">
+                    <img 
+                        src="darkmodelogo.png"
+                        alt="Gesturix Logo" 
+                        class="theme-logo w-8 h-8 md:w-10 md:h-10 object-contain flex-shrink-0"
+                    >
+                    <div class="min-w-0">
+                        <h1 class="text-xs md:text-xl text-white font-bold tracking-tight">Gesturix</h1>
+                        <p class="text-[#737373] text-[0.625rem] md:text-[0.8125rem] font-normal">Learn sign language at your own pace</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button id="themeToggle" onclick="toggleTheme()" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <i class="bi bi-sun"></i>
+                        <span class="hidden lg:inline theme-label">Light mode</span>
+                    </button>
+                    <button id="logoutBtn" onclick="logout()" class="px-2 md:px-4 py-1.5 md:py-2.5 border border-[#262626] rounded-lg bg-[#171717] text-[#e5e5e5] text-[0.6875rem] md:text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-[#1a1a1a] hover:border-[#333333] inline-flex items-center gap-1 md:gap-2">
+                        <i class="bi bi-box-arrow-right text-sm"></i>
+                        <span class="hidden lg:inline">Logout</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <nav class="w-full m-0 py-3 md:py-4 border-b border-[#1a1a7e] flex flex-row justify-between items-center gap-2 md:gap-4 px-4 md:px-8 overflow-x-auto" id="mainNav" style="scrollbar-width: none; -ms-overflow-style: none;">
+            <div class="flex gap-1.5 md:gap-2 flex-nowrap justify-start flex-shrink-0">
+                <button class="nav-btn px-2 md:px-4 py-1.5 md:py-2.5 border border-transparent bg-transparent text-[#737373] rounded-lg text-[0.6875rem] md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-1 md:gap-2 hover:bg-[#171717] hover:text-[#e5e5e5] whitespace-nowrap" data-section="home" onclick="navigateToSection('home')">
+                    <i class="bi bi-house text-sm md:text-sm"></i>
+                    <span>Home</span>
+                </button>
+                <button class="nav-btn px-2 md:px-4 py-1.5 md:py-2.5 border border-transparent bg-transparent text-[#737373] rounded-lg text-[0.6875rem] md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-1 md:gap-2 hover:bg-[#171717] hover:text-[#e5e5e5] whitespace-nowrap" data-section="lessons" onclick="navigateToSection('lessons')">
+                    <i class="bi bi-book-half text-sm md:text-sm"></i>
+                    <span>Lessons</span>
+                </button>
+                <button class="nav-btn px-2 md:px-4 py-1.5 md:py-2.5 border border-transparent bg-transparent text-[#737373] rounded-lg text-[0.6875rem] md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-1 md:gap-2 hover:bg-[#171717] hover:text-[#e5e5e5] whitespace-nowrap" data-section="practice" onclick="navigateToSection('practice')">
+                    <i class="bi bi-controller text-sm md:text-sm"></i>
+                    <span>Practice</span>
+                </button>
+                <button class="nav-btn px-2 md:px-4 py-1.5 md:py-2.5 border border-transparent bg-transparent text-[#737373] rounded-lg text-[0.6875rem] md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-1 md:gap-2 hover:bg-[#171717] hover:text-[#e5e5e5] whitespace-nowrap" data-section="progress" onclick="navigateToSection('progress')">
+                    <i class="bi bi-bar-chart text-sm md:text-sm"></i>
+                    <span>Progress</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2 md:gap-3 justify-end flex-shrink-0">
+                <span class="hidden md:flex items-center gap-2 text-[#a3a3a3] text-sm font-medium">
+                    <i class="bi bi-globe"></i>
+                    Language:
+                </span>
+                <select id="languageSelect" onchange="switchLanguage(this.value)" class="px-2 md:px-4 py-1.5 md:py-2.5 border border-[#262626] rounded-lg bg-[#171717] text-[#e5e5e5] text-[0.6875rem] md:text-sm font-medium cursor-pointer transition-all duration-150 w-auto hover:border-[#333333] focus:outline-none focus:border-white focus:shadow-[0_0_0_1px_#ffffff] max-w-[200px] md:max-w-none">
+                    <option value="asl">🇺🇸 ASL</option>
+                    <option value="fsl">🇵🇭 FSL</option>
+                </select>
+            </div>
+        </nav>
+        <section id="home" class="section w-full m-0 p-4 md:p-8 animate-fade-in">
+            <!-- reduced padding to tighten header-to-content spacing -->
+            <div class="text-center py-2 md:py-4">
+                <h2 id="personalizedWelcome" class="text-white text-2xl md:text-4xl font-bold mb-2 md:mb-3 tracking-tight">Welcome to Gesturix</h2>
+                <p id="userCourseYear" class="text-base md:text-xl text-[#a3a3a3] mb-3 md:mb-4 font-medium"></p>
+                <p id="welcomeText" class="text-sm md:text-lg text-[#a3a3a3] mb-8 md:mb-12 max-w-[600px] mx-auto px-4">Learn American Sign Language (ASL) through interactive lessons and engaging practice games.</p>
+                <div class="flex justify-center gap-3 md:gap-6 mb-8 md:mb-12 flex-nowrap overflow-x-auto px-2">
+                    <div class="bg-[#171717] p-4 md:p-6 rounded-xl border border-[#262626] transition-all duration-150 hover:border-[#333333] text-center flex-1 basis-0 min-w-0 md:flex-none md:w-[200px]">
+                        <i class="bi bi-bullseye text-[1.5rem] md:text-[2rem] text-[#0ea5e9] mb-2 md:mb-3 block"></i>
+                        <div class="text-2xl md:text-4xl font-bold mb-1 md:mb-2 text-white tracking-tight" id="totalLearned">0</div>
+                        <div class="text-xs md:text-sm text-[#a3a3a3] font-medium">Signs learned</div>
+                    </div>
+                    <div class="bg-[#171717] p-4 md:p-6 rounded-xl border border-[#262626] transition-all duration-150 hover:border-[#333333] text-center flex-1 basis-0 min-w-0 md:flex-none md:w-[200px]">
+                        <i class="bi bi-trophy text-[1.5rem] md:text-[2rem] text-[#0ea5e9] mb-2 md:mb-3 block"></i>
+                        <div class="text-2xl md:text-4xl font-bold mb-1 md:mb-2 text-white tracking-tight" id="totalScore">0</div>
+                        <div class="text-xs md:text-sm text-[#a3a3a3] font-medium">Total score</div>
+                    </div>
+                    <div class="bg-[#171717] p-4 md:p-6 rounded-xl border border-[#262626] transition-all duration-150 hover:border-[#333333] text-center flex-1 basis-0 min-w-0 md:flex-none md:w-[200px]">
+                        <i class="bi bi-book-half text-[1.5rem] md:text-[2rem] text-[#0ea5e9] mb-2 md:mb-3 block"></i>
+                        <div class="text-2xl md:text-4xl font-bold mb-1 md:mb-2 text-white tracking-tight" id="quizzesTaken">0</div>
+                        <div class="text-xs md:text-sm text-[#a3a3a3] font-medium">Quizzes completed</div>
+                    </div>
+                </div>
+                <button class="px-6 md:px-8 py-3 md:py-4 border-none rounded-lg text-sm md:text-base font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-white text-[#0a0a0a] hover:bg-[#e5e5e5] active:scale-[0.98]" onclick="navigateToSection('lessons')">
+                    <i class="bi bi-book-half"></i>
+                    Start learning
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+        <section id="lessons" class="section w-full m-0 pt-2 md:pt-4 px-4 md:px-8 pb-4 md:pb-8 animate-fade-in">
+            <h2 class="text-white text-xl md:text-[2rem] font-bold mt-2 md:mt-4 mb-3 md:mb-4 tracking-tight text-center">Choose a category</h2>
+            <p class="text-[#a3a3a3] text-sm md:text-base mb-6 md:mb-8 text-center">Select a topic to begin learning</p>
+            <div class="lesson-categories flex justify-center gap-2 md:gap-4 my-4 md:my-6 flex-wrap px-2">
+                <div class="category-card bg-[#171717] border border-[#262626] rounded-xl p-4 md:p-6 text-center cursor-pointer transition-all duration-150 hover:border-[#0ea5e9] hover:bg-[#1a1a1a] w-[calc(50%-0.375rem)] min-w-[140px] md:w-[200px] flex-shrink-0" data-category="alphabet" onclick="showLesson('alphabet')">
+                    <i class="bi bi-fonts text-[1.5rem] md:text-[2rem] mb-2 md:mb-3 text-[#0ea5e9]"></i>
+                    <h3 class="text-white mb-1 md:mb-2 text-sm md:text-base font-semibold">Alphabet</h3>
+                    <p class="text-[#a3a3a3] mb-3 md:mb-4 text-xs md:text-sm">Learn A-Z in ASL</p>
+                    <div class="w-full h-1.5 bg-[#262626] rounded-sm overflow-hidden">
+                        <div class="h-full bg-[#0ea5e9] transition-[width] duration-300" id="progress-alphabet" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="category-card bg-[#171717] border border-[#262626] rounded-xl p-4 md:p-6 text-center cursor-pointer transition-all duration-150 hover:border-[#0ea5e9] hover:bg-[#1a1a1a] w-[calc(50%-0.375rem)] min-w-[140px] md:w-[200px] flex-shrink-0" data-category="numbers" onclick="showLesson('numbers')">
+                    <i class="bi bi-hash text-[1.5rem] md:text-[2rem] mb-2 md:mb-3 text-[#0ea5e9]"></i>
+                    <h3 class="text-white mb-1 md:mb-2 text-sm md:text-base font-semibold">Numbers</h3>
+                    <p class="text-[#a3a3a3] mb-3 md:mb-4 text-xs md:text-sm">Learn 0-10 in ASL</p>
+                    <div class="w-full h-1.5 bg-[#262626] rounded-sm overflow-hidden">
+                        <div class="h-full bg-[#0ea5e9] transition-[width] duration-300" id="progress-numbers" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="category-card bg-[#171717] border border-[#262626] rounded-xl p-4 md:p-6 text-center cursor-pointer transition-all duration-150 hover:border-[#0ea5e9] hover:bg-[#1a1a1a] w-[calc(50%-0.375rem)] min-w-[140px] md:w-[200px] flex-shrink-0" data-category="greetings" onclick="showLesson('greetings')">
+                    <i class="bi bi-hand-thumbs-up text-[1.5rem] md:text-[2rem] mb-2 md:mb-3 text-[#0ea5e9]"></i>
+                    <h3 class="text-white mb-1 md:mb-2 text-sm md:text-base font-semibold">Greetings</h3>
+                    <p class="text-[#a3a3a3] mb-3 md:mb-4 text-xs md:text-sm">Common greetings</p>
+                    <div class="w-full h-1.5 bg-[#262626] rounded-sm overflow-hidden">
+                        <div class="h-full bg-[#0ea5e9] transition-[width] duration-300" id="progress-greetings" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="category-card bg-[#171717] border border-[#262626] rounded-xl p-4 md:p-6 text-center cursor-pointer transition-all duration-150 hover:border-[#0ea5e9] hover:bg-[#1a1a1a] w-[calc(50%-0.375rem)] min-w-[140px] md:w-[200px] flex-shrink-0" data-category="common" onclick="showLesson('common')">
+                    <i class="bi bi-chat-dots text-[1.5rem] md:text-[2rem] mb-2 md:mb-3 text-[#0ea5e9]"></i>
+                    <h3 class="text-white mb-1 md:mb-2 text-sm md:text-base font-semibold">Common words</h3>
+                    <p class="text-[#a3a3a3] mb-3 md:mb-4 text-xs md:text-sm">Everyday vocabulary</p>
+                    <div class="w-full h-1.5 bg-[#262626] rounded-sm overflow-hidden">
+                        <div class="h-full bg-[#0ea5e9] transition-[width] duration-300" id="progress-common" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="lessonDetail" class="mt-0 hidden">
+                <div class="flex items-center justify-between md:justify-start gap-1 md:gap-2 mb-4 md:mb-6 px-1 w-full">
+                    <button class="px-4 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-2 justify-center bg-[#171717] text-[#a3a3a3] border border-[#262626] hover:bg-[#1a1a1a] hover:text-[#e5e5e5]" onclick="hideLesson()">
+                        <i class="bi bi-arrow-left"></i>
+                        Back to categories
+                    </button>
+                    <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-2 justify-center bg-white text-[#0a0a0a] hover:bg-[#e5e5e5] active:scale-[0.98]" onclick="startQuiz()">
+                        <i class="bi bi-bullseye"></i>
+                        Take quiz
+                    </button>
+                </div>
+                <h2 id="lessonTitle" class="text-white text-xl md:text-[2rem] font-bold mb-4 md:mb-6 tracking-tight text-center"></h2>
+                <div class="flex justify-center my-6 md:my-8 px-2">
+                    <div class="w-full max-w-[500px]" id="flashcard">
+                        <div class="bg-[#171717] rounded-2xl px-6 py-8 md:px-8 md:py-12 text-center border border-[#262626] min-h-[320px] md:min-h-[400px] flex flex-col justify-center">
+                            <div class="text-[5rem] md:text-[8rem] mb-4 md:mb-6 min-h-[120px] md:min-h-[180px] flex items-center justify-center" id="signVisual"></div>
+                            <h3 id="signName" class="text-xl md:text-[2rem] text-white mb-3 md:mb-4 font-bold"></h3>
+                            <p class="text-sm md:text-base text-[#a3a3a3] leading-relaxed" id="signDescription"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center gap-2 md:gap-4 my-4 md:my-6 flex-wrap px-2">
+                    <button class="px-4 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#171717] text-[#e5e5e5] border border-[#262626] hover:bg-[#1a1a1a] hover:border-[#333333]" id="prevBtn" onclick="previousSign()">
+                        <i class="bi bi-arrow-left"></i>
+                        <span class="hidden md:inline">Previous</span>
+                        <span class="inline md:hidden">Prev</span>
+                    </button>
+                    <span class="text-xs md:text-sm text-[#a3a3a3] font-medium min-w-[60px] md:min-w-[80px] text-center" id="cardCounter">1 / 1</span>
+                    <button class="px-4 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#171717] text-[#e5e5e5] border border-[#262626] hover:bg-[#1a1a1a] hover:border-[#333333]" id="nextBtn" onclick="nextSign()">
+                        Next
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section id="practice" class="section w-full m-0 p-4 md:p-8 animate-fade-in">
+            <div id="quizView" class="max-w-[800px] mx-auto hidden px-2">
+                <div class="text-center mb-6 md:mb-8">
+                    <h2 class="text-white mb-3 md:mb-4 text-xl md:text-[1.875rem] font-bold text-center">Quiz: <span id="quizCategory"></span></h2>
+                    <div class="flex justify-center gap-4 md:gap-8 text-xs md:text-sm text-[#a3a3a3]">
+                        <span>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></span>
+                        <span class="font-semibold text-[#0ea5e9]">Score: <span id="quizScore">0</span></span>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-[#171717] rounded-2xl px-6 py-8 md:px-8 md:py-12 text-center mb-6 md:mb-8 border border-[#262626]">
+                        <div class="text-[4rem] md:text-[6rem] mb-4 md:mb-6 min-h-[100px] md:min-h-[120px] flex items-center justify-center" id="quizSignDisplay"></div>
+                        <p class="text-base md:text-xl text-white font-semibold" id="questionText">What sign is this?</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3 md:gap-4 mb-6 md:mb-8" id="optionsGrid">
+                    </div>
+                </div>
+                <div class="text-center px-4 py-3 md:py-4 rounded-xl text-sm md:text-base font-medium mb-6 hidden" id="feedback"></div>
+                <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#171717] text-[#a3a3a3] border border-[#262626] hover:bg-[#1a1a1a] hover:text-[#e5e5e5]" onclick="exitQuiz()">
+                    <i class="bi bi-x"></i>
+                    Exit quiz
+                </button>
+            </div>
+            <div id="quizResults" class="text-center max-w-[600px] mx-auto hidden px-2">
+                <div class="flex flex-col items-center gap-3 md:gap-4 mb-6 md:mb-8">
+                    <i class="bi bi-trophy text-[3rem] md:text-[4rem] text-[#0ea5e9]"></i>
+                    <h2 class="text-white text-2xl md:text-4xl font-bold">Quiz complete!</h2>
+                </div>
+                <div class="bg-[#171717] rounded-2xl px-6 py-8 md:px-8 md:py-12 mb-6 md:mb-8 border border-[#262626]">
+                    <div class="mb-4 md:mb-6">
+                        <div class="text-[3rem] md:text-[4rem] font-bold text-white tracking-tight" id="finalScore">0</div>
+                        <p class="text-base md:text-lg text-[#a3a3a3]">out of <span id="finalTotal">10</span></p>
+                    </div>
+                    <div class="text-xl md:text-[2rem] text-[#0ea5e9] font-bold mb-4 md:mb-6" id="percentage"></div>
+                    <p class="text-base md:text-lg text-[#a3a3a3]" id="resultsMessage"></p>
+                </div>
+                <div class="flex gap-3 md:gap-4 justify-center flex-wrap">
+                    <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-white text-[#0a0a0a] hover:bg-[#e5e5e5] active:scale-[0.98]" onclick="retryQuiz()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Try again
+                    </button>
+                    <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#171717] text-[#e5e5e5] border border-[#262626] hover:bg-[#1a1a1a] hover:border-[#333333]" onclick="navigateToSection('lessons')">
+                        <i class="bi bi-book-half"></i>
+                        Back to lessons
+                    </button>
+                </div>
+            </div>
+            <div id="rhythmGame" class="max-w-[600px] mx-auto hidden px-2">
+                <div class="text-center mb-5 md:mb-6">
+                    <h2 id="rhythmGameTitle" class="text-white mb-3 md:mb-4 text-xl md:text-2xl font-bold flex items-center justify-center gap-2">
+                        <i class="bi bi-music-note-beamed"></i>
+                        ASL Rhythm Game
+                    </h2>
+                    <div class="flex justify-center gap-4 md:gap-8 text-xs md:text-sm">
+                        <span class="text-[#a3a3a3] flex items-center gap-1">
+                            <i class="bi bi-bullseye"></i>
+                            Score: <strong class="text-[#0ea5e9] text-base md:text-lg" id="rhythmScore">0</strong>
+                        </span>
+                        <span class="text-[#a3a3a3] flex items-center gap-1">
+                            <i class="bi bi-lightning-charge"></i>
+                            Combo: <strong class="text-[#0ea5e9] text-base md:text-lg" id="rhythmCombo">0</strong>
+                        </span>
+                    </div>
+                </div>
+                <div class="relative mb-6 md:mb-8">
+                    <div class="relative w-full h-[300px] md:h-[400px] bg-[#171717] rounded-2xl overflow-hidden border border-[#262626]">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 text-[3.5rem] md:text-[5rem] transition-[top] duration-100 linear z-10" id="fallingSign">👋</div>
+                        <div class="absolute bottom-[80px] md:bottom-[100px] left-0 w-full h-16 md:h-20 bg-[rgba(14,165,233,0.1)] border-t-2 border-b-2 border-dashed border-[#0ea5e9]"></div>
+                    </div>
+                </div>
+                <div class="text-center text-lg md:text-2xl font-bold mb-4 md:mb-6 min-h-[32px] md:min-h-[40px] opacity-0 transition-opacity duration-200" id="rhythmFeedback"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6" id="rhythmOptions">
+                </div>
+                <div class="text-center mt-6">
+                    <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#dc2626] text-white hover:bg-[#b91c1c]" onclick="stopRhythmGame()">
+                        <i class="bi bi-stop-fill"></i>
+                        Stop game
+                    </button>
+                </div>
+            </div>
+            <div id="rhythmResults" class="text-center max-w-[600px] mx-auto hidden px-2">
+                <div class="flex flex-col items-center gap-3 md:gap-4 mb-6 md:mb-8">
+                    <i class="bi bi-trophy text-[3rem] md:text-[4rem] text-[#0ea5e9]"></i>
+                    <h2 class="text-white text-2xl md:text-4xl font-bold">Game over!</h2>
+                </div>
+                <div class="bg-[#171717] rounded-2xl px-6 py-8 md:px-8 md:py-12 mb-6 md:mb-8 border border-[#262626]">
+                    <div class="mb-4 md:mb-6">
+                        <div class="text-[3rem] md:text-[4rem] font-bold text-white tracking-tight" id="rhythmFinalScore">0</div>
+                        <p class="text-base md:text-lg text-[#a3a3a3]">Total score</p>
+                    </div>
+                    <div class="bg-[#0a0a0a] px-3 py-3 md:px-4 md:py-4 rounded-xl my-3 md:my-4 flex justify-between items-center border border-[#262626]">
+                        <span class="text-xs md:text-sm text-[#a3a3a3] font-medium">Max combo:</span>
+                        <span class="text-lg md:text-xl font-bold text-[#0ea5e9]" id="rhythmMaxCombo">0</span>
+                    </div>
+                    <p class="text-base md:text-lg text-[#a3a3a3]" id="rhythmResultMessage"></p>
+                </div>
+                <div class="flex gap-3 md:gap-4 justify-center flex-wrap">
+                    <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-white text-[#0a0a0a] hover:bg-[#e5e5e5] active:scale-[0.98]" onclick="retryRhythmGame()">
+                        <i class="bi bi-play-fill"></i>
+                        Play again
+                    </button>
+                    <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#171717] text-[#e5e5e5] border border-[#262626] hover:bg-[#1a1a1a] hover:border-[#333333]" onclick="exitRhythmGame()">
+                        <i class="bi bi-arrow-left"></i>
+                        Back to practice
+                    </button>
+                </div>
+            </div>
+            <div id="practiceHome" class="max-w-[800px] mx-auto px-2">
+                <h2 class="text-white text-xl md:text-[2rem] font-bold mb-3 md:mb-4 tracking-tight text-center">Practice your skills</h2>
+                <p class="text-[#a3a3a3] text-sm md:text-base mb-6 md:mb-8 text-center">Choose how you want to practice today</p>
+                <div class="grid grid-cols-2 gap-4 md:gap-6 my-6 md:my-8 max-w-[600px] mx-auto px-2">
+                    <div class="bg-[#171717] rounded-xl p-5 md:p-6 text-center transition-all duration-150 border border-[#262626] hover:border-[#0ea5e9] hover:bg-[#1a1a1a] flex flex-col">
+                        <i class="bi bi-book-half text-[2rem] md:text-[2.5rem] mb-2 md:mb-3 text-[#0ea5e9]"></i>
+                        <h3 class="text-white mb-2 font-semibold text-base md:text-base">Quiz mode</h3>
+                        <p class="text-[#a3a3a3] mb-4 md:mb-5 text-xs md:text-sm min-h-[36px] md:min-h-[40px]">Test your knowledge with quizzes</p>
+                        <button class="w-full px-4 md:px-5 py-2 md:py-2.5 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-2 justify-center bg-white text-[#0a0a0a] hover:bg-[#e5e5e5] active:scale-[0.98] mt-auto" onclick="navigateToSection('lessons')">Start quiz</button>
+                    </div>
+                    <div class="bg-[#171717] rounded-xl p-5 md:p-6 text-center transition-all duration-150 border border-[#262626] hover:border-[#0ea5e9] hover:bg-[#1a1a1a] flex flex-col">
+                        <i class="bi bi-music-note-beamed text-[2rem] md:text-[2.5rem] mb-2 md:mb-3 text-[#0ea5e9]"></i>
+                        <h3 class="text-white mb-2 font-semibold text-base md:text-base">Rhythm game</h3>
+                        <p class="text-[#a3a3a3] mb-4 md:mb-5 text-xs md:text-sm min-h-[36px] md:min-h-[40px]">Tap the signs as they fall</p>
+                        <button class="w-full px-4 md:px-5 py-2 md:py-2.5 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center gap-2 justify-center bg-white text-[#0a0a0a] hover:bg-[#e5e5e5] active:scale-[0.98] mt-auto" onclick="startRhythmGame('alphabet')">Play game</button>
+                    </div>
+                </div>
+                <div class="mt-8 md:mt-12 p-5 md:p-6 bg-[#171717] rounded-xl border border-[#262626] max-w-[600px] mx-auto">
+                    <h3 class="text-white mb-4 md:mb-5 text-center font-semibold text-sm md:text-base">Select category for rhythm game</h3>
+                    <div class="flex gap-2 md:gap-3 flex-wrap justify-center">
+                        <button class="px-3 md:px-4 py-2 md:py-2.5 bg-[#0a0a0a] border border-[#262626] rounded-lg text-[#e5e5e5] font-medium cursor-pointer transition-all duration-150 text-xs md:text-sm inline-flex items-center gap-1.5 md:gap-2 hover:bg-white hover:text-[#0a0a0a] hover:border-white w-auto flex-shrink-0" onclick="startRhythmGame('alphabet')">
+                            <i class="bi bi-fonts"></i>
+                            Alphabet
+                        </button>
+                        <button class="px-3 md:px-4 py-2 md:py-2.5 bg-[#0a0a0a] border border-[#262626] rounded-lg text-[#e5e5e5] font-medium cursor-pointer transition-all duration-150 text-xs md:text-sm inline-flex items-center gap-1.5 md:gap-2 hover:bg-white hover:text-[#0a0a0a] hover:border-white w-auto flex-shrink-0" onclick="startRhythmGame('numbers')">
+                            <i class="bi bi-hash"></i>
+                            Numbers
+                        </button>
+                        <button class="px-3 md:px-4 py-2 md:py-2.5 bg-[#0a0a0a] border border-[#262626] rounded-lg text-[#e5e5e5] font-medium cursor-pointer transition-all duration-150 text-xs md:text-sm inline-flex items-center gap-1.5 md:gap-2 hover:bg-white hover:text-[#0a0a0a] hover:border-white w-auto flex-shrink-0" onclick="startRhythmGame('greetings')">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                            Greetings
+                        </button>
+                        <button class="px-3 md:px-4 py-2 md:py-2.5 bg-[#0a0a0a] border border-[#262626] rounded-lg text-[#e5e5e5] font-medium cursor-pointer transition-all duration-150 text-xs md:text-sm inline-flex items-center gap-1.5 md:gap-2 hover:bg-white hover:text-[#0a0a0a] hover:border-white w-auto flex-shrink-0" onclick="startRhythmGame('common')">
+                            <i class="bi bi-chat-dots"></i>
+                            Common words
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="progress" class="section w-full m-0 p-4 md:p-8 animate-fade-in">
+            <h2 class="text-white text-xl md:text-[2rem] font-bold mb-4 tracking-tight text-center">Your learning progress</h2>
+            <p class="text-[#a3a3a3] text-sm md:text-base mb-6 md:mb-8 text-center">Track your achievements and stats</p>
+            <div class="flex justify-center gap-4 md:gap-6 mb-8 md:mb-12 flex-wrap px-2">
+                <div class="bg-[#171717] rounded-xl p-4 md:p-6 text-center border border-[#262626] w-full sm:w-[340px] flex-shrink-0 flex flex-col">
+                    <h3 class="text-white mb-3 md:mb-5 font-semibold text-sm md:text-base">Overall progress</h3>
+                    <div class="relative inline-block w-[100px] h-[100px] md:w-[140px] md:h-[140px] mx-auto">
+                        <svg class="w-full h-full" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="50" stroke="#262626" stroke-width="8" fill="none"></circle>
+                            <circle id="progressCircle" cx="60" cy="60" r="50" stroke="#0ea5e9" stroke-width="8" fill="none" 
+                                    stroke-dasharray="314" stroke-dashoffset="314" 
+                                    transform="rotate(-90 60 60)"></circle>
+                        </svg>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl md:text-[1.75rem] font-bold text-[#0ea5e9]" id="overallProgress">0%</div>
+                    </div>
+                </div>
+                <div class="achievements bg-[#171717] rounded-xl p-4 md:p-6 text-white border border-[#262626] w-full sm:w-[340px] flex-shrink-0 h-[280px] md:h-[280px] flex flex-col">
+                    <h3 class="mb-3 md:mb-4 flex items-center font-semibold text-sm md:text-base">
+                        <i class="bi bi-trophy mr-2"></i>
+                        Achievements
+                    </h3>
+                    <div id="achievementsList" class="flex flex-col gap-2 md:gap-3 text-sm md:text-base overflow-y-auto flex-1" style="scrollbar-width: none; -ms-overflow-style: none;">
+                    </div>
+                </div>
+            </div>
+            <div class="bg-[#171717] rounded-xl p-5 md:p-6 mb-6 md:mb-8 border border-[#262626] max-w-[700px] mx-auto">
+                <h3 class="text-white mb-4 md:mb-5 font-semibold text-sm md:text-base">Progress by category</h3>
+                <div id="categoryProgressList" class="text-sm md:text-base">
+                </div>
+            </div>
+            <button class="px-5 md:px-6 py-2.5 md:py-3 border-none rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all duration-150 m-1 inline-flex items-center gap-2 justify-center bg-[#dc2626] text-white hover:bg-[#b91c1c]" onclick="resetProgress(); return false;">
+                <i class="bi bi-trash"></i>
+                Reset all progress
+            </button>
+        </section>
+    </div>
+    <!-- Theme system is loaded in head section -->
+    <script src="script.js"></script>
+    <script>
+        // Logout function with IndexedDB save
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Save stats before logging out
+                await window.StatsDB.save();
+                window.StatsDB.stopAutoSave();
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentSection');
+                window.location.href = 'index.html';
+            }
+        }
+        // Override resetProgress to use IndexedDB
+        async function resetProgress() {
+            if (confirm('Are you sure you want to reset all your progress? This cannot be undone!')) {
+                await window.StatsDB.reset();
+                // Reload the page to reflect changes
+                window.location.reload();
+            }
+        }
+        // Store original functions before overriding
+        let _scriptSaveProgress = null;
+        let _scriptSaveUserProgress = null;
+        let _scriptUpdateQuizStats = null;
+        let _scriptMarkSignLearned = null;
+        // Wait for script.js to load, then override functions
+        function initializeOverrides() {
+            // Store original saveProgress from script.js
+            if (typeof saveProgress === 'function') {
+                _scriptSaveProgress = saveProgress;
+                // Override saveProgress to use IndexedDB
+                window.saveProgress = async function(progress) {
+                    // Call original save (to localStorage)
+                    if (progress) {
+                        localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
+                    }
+                    saveUserProgress();
+                    // Also save to IndexedDB
+                    await window.StatsDB.save();
+                };
+            }
+            // Store original saveUserProgress
+            if (typeof saveUserProgress === 'function') {
+                _scriptSaveUserProgress = saveUserProgress;
+                // Override saveUserProgress to use IndexedDB
+                window.saveUserProgress = async function() {
+                    const currentUser = localStorage.getItem('currentUser');
+                    if (!currentUser) return;
+                    const userData = JSON.parse(currentUser);
+                    const progress = getProgress();
+                    const users = getAllUsers();
+                    const userIndex = users.findIndex(u => u.name === userData.name);
+                    if (userIndex !== -1) {
+                        users[userIndex].progress = progress;
+                        users[userIndex].lastLogin = new Date().toISOString();
+                        saveAllUsers(users);
+                    }
+                    // Save to IndexedDB
+                    await window.StatsDB.save();
+                };
+            }
+            // Override updateQuizStats
+            if (typeof updateQuizStats === 'function') {
+                _scriptUpdateQuizStats = updateQuizStats;
+                window.updateQuizStats = async function(score, total) {
+                    const progress = getProgress();
+                    progress[currentLanguage].totalScore += score;
+                    progress[currentLanguage].quizzesTaken += 1;
+                    await checkAchievements(progress[currentLanguage]);
+                    saveProgress(progress);
+                    await window.StatsDB.save();
+                };
+            }
+            // Override markSignLearned
+            if (typeof markSignLearned === 'function') {
+                _scriptMarkSignLearned = markSignLearned;
+                window.markSignLearned = async function(category, signId) {
+                    const progress = getProgress();
+                    if (!progress[currentLanguage].learned[category].includes(signId)) {
+                        progress[currentLanguage].learned[category].push(signId);
+                        saveProgress(progress);
+                    }
+                };
+            }
+        }
+        
+        // Simple StatsDB implementation using localStorage
+        window.StatsDB = {
+            init: async function() {
+                console.log('StatsDB: Using localStorage backend');
+                return Promise.resolve();
+            },
+            load: async function() {
+                // Data is already in localStorage, nothing to do
+                return Promise.resolve();
+            },
+            save: async function() {
+                // Data is automatically saved to localStorage by the app
+                return Promise.resolve();
+            },
+            reset: async function() {
+                // Reset is handled by the app's resetProgress function
+                return Promise.resolve();
+            },
+            startAutoSave: function(interval) {
+                // Auto-save handled by beforeunload event
+                console.log('StatsDB: Auto-save interval set to', interval, 'ms');
+            },
+            stopAutoSave: function() {
+                // No-op
+            }
+        };
+        
+        // Check if user is logged in and initialize IndexedDB
+        window.addEventListener('DOMContentLoaded', async function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                // Not logged in, redirect to index
+                window.location.href = 'index.html';
+                return;
+            }
+            // User is logged in, load their data
+            const userData = JSON.parse(currentUser);
+            // Initialize function overrides after script.js loads
+            initializeOverrides();
+            // Initialize IndexedDB
+            try {
+                await window.StatsDB.init();
+                console.log('IndexedDB initialized');
+                // Load user stats from IndexedDB
+                await window.StatsDB.load();
+                console.log('User stats loaded from IndexedDB');
+                // Ensure progress data has correct structure
+                const progress = getProgress();
+                console.log('Progress after load:', progress);
+                // Verify achievements arrays exist
+                if (progress.asl && !Array.isArray(progress.asl.achievements)) {
+                    console.warn('Fixing ASL achievements array');
+                    progress.asl.achievements = [];
+                    saveProgress(progress);
+                }
+                if (progress.fsl && !Array.isArray(progress.fsl.achievements)) {
+                    console.warn('Fixing FSL achievements array');
+                    progress.fsl.achievements = [];
+                    saveProgress(progress);
+                }
+                // Start auto-save (saves every 30 seconds)
+                window.StatsDB.startAutoSave(30000);
+            } catch (error) {
+                console.error('Error initializing IndexedDB:', error);
+                // Continue with localStorage fallback
+            }
+            // Update personalized welcome message
+            const personalizedWelcome = document.getElementById('personalizedWelcome');
+            const userCourseYear = document.getElementById('userCourseYear');
+            if (personalizedWelcome && userData.name) {
+                personalizedWelcome.textContent = `Welcome to Gesturix, ${userData.name}!`;
+            }
+            if (userCourseYear && userData.course && userData.year) {
+                userCourseYear.textContent = `${userData.course} - ${userData.year}`;
+            }
+            loadUserProgress(userData.name);
+            // Use setTimeout to ensure data is loaded before updating UI
+            setTimeout(() => {
+                updateHomeStats();
+                updateCategoryProgress();
+            }, 100);
+        });
+        // Save stats before leaving the page
+        window.addEventListener('beforeunload', function(e) {
+            // Trigger synchronous save (navigator.sendBeacon could be used for more reliability)
+            window.StatsDB.save().catch(err => console.error('Error saving on beforeunload:', err));
+        });
+    </script>
+</body>
+</html>

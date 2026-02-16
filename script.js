@@ -1,11 +1,101 @@
-/* ===================================
-   SUPABASE CONFIGURATION
-   =================================== */
-''
-/* ===================================
-   AUTHENTICATION FUNCTIONS
-   =================================== */
+function displayUserInfo(userData) {
+    const userInfoDiv = document.getElementById('userInfo');
+    userInfoDiv.innerHTML = '';
+    
+    const userInfoText = document.createElement('div');
+    userInfoText.className = 'user-info-text';
+    
+    const welcomeP = document.createElement('p');
+    const welcomeStrong = document.createElement('strong');
+    
+    let displayName;
+    if (userData.firstName) {
+        displayName = userData.firstName;
+    } else {
+        displayName = userData.name.split(' ')[0];
+    }
+    
+    welcomeStrong.textContent = `Welcome, ${displayName}!`;
+    welcomeP.appendChild(welcomeStrong);
+    
+    const courseP = document.createElement('p');
+    courseP.textContent = `${userData.course} - ${userData.year}`;
+    
+    userInfoText.appendChild(welcomeP);
+    userInfoText.appendChild(courseP);
+    
+    const logoutBtn = document.createElement('button');
+    logoutBtn.className = 'logout-btn';
+    logoutBtn.textContent = '🚪 Logout';
+    logoutBtn.onclick = logout;
+    
+    userInfoDiv.appendChild(userInfoText);
+    userInfoDiv.appendChild(logoutBtn);
+}
 
+
+//Get full name from user data
+
+function getFullName(userData) {
+    if (userData.firstName && userData.lastName) {
+        if (userData.middleName) {
+            return `${userData.firstName} ${userData.middleName} ${userData.lastName}`;
+        }
+        return `${userData.firstName} ${userData.lastName}`;
+    }
+    return userData.name;
+}
+
+
+//Migrate old users to new name format
+
+function migrateOldUserData() {
+    const users = getAllUsers();
+    let needsSave = false;
+    
+    users.forEach(user => {
+        if (!user.firstName && user.name) {
+            const nameParts = user.name.trim().split(' ');
+            
+            if (nameParts.length === 2) {
+                user.firstName = nameParts[0];
+                user.middleName = '';
+                user.lastName = nameParts[1];
+            } else if (nameParts.length === 3) {
+                user.firstName = nameParts[0];
+                user.middleName = nameParts[1];
+                user.lastName = nameParts[2];
+            } else if (nameParts.length > 3) {
+                user.firstName = nameParts[0];
+                user.middleName = nameParts.slice(1, -1).join(' ');
+                user.lastName = nameParts[nameParts.length - 1];
+            } else {
+                user.firstName = nameParts[0];
+                user.middleName = '';
+                user.lastName = '';
+            }
+            
+            needsSave = true;
+        }
+    });
+    
+    if (needsSave) {
+        saveAllUsers(users);
+        console.log('User data migrated to new format');
+    }
+}
+
+// Run migration on page load
+document.addEventListener('DOMContentLoaded', function() {
+    migrateOldUserData();
+});
+function getAllUsers() {
+    const users = localStorage.getItem('signLanguageUsers');
+    return users ? JSON.parse(users) : [];
+}
+function saveAllUsers(users) {
+    localStorage.setItem('signLanguageUsers', JSON.stringify(users));
+}
 function hashPassword(password) {
     let hash = 0;
     for (let i = 0; i < password.length; i++) {
@@ -15,195 +105,17 @@ function hashPassword(password) {
     }
     return hash.toString();
 }
-
-async function checkUserSession() {
+function findUserByName(name) {
+    const users = getAllUsers();
+    return users.find(user => user.name.toLowerCase() === name.toLowerCase());
+}
+function checkUserSession() {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
-        const userData = JSON.parse(currentUser);
-        await showMainApp(userData);
         return true;
     }
     return false;
 }
-
-function showLoginPage() {
-    const launchSlide = document.getElementById('launchSlide');
-    const loginPage = document.getElementById('loginPage');
-    const mainApp = document.getElementById('mainApp');
-    
-    launchSlide.classList.add('fade-out');
-    setTimeout(() => {
-        launchSlide.style.display = 'none';
-    }, 800);
-    
-    setTimeout(() => {
-        loginPage.classList.remove('hidden');
-        populateUserNamesList();
-    }, 500);
-    
-    mainApp.classList.add('hidden');
-}
-
-function showNewUserForm() {
-    document.getElementById('newUserForm').classList.remove('hidden');
-    document.getElementById('returningUserForm').classList.add('hidden');
-    document.getElementById('newUserBtn').classList.add('active');
-    document.getElementById('returningUserBtn').classList.remove('active');
-    document.getElementById('loginSubtext').textContent = 'Create your account to get started';
-}
-
-function showReturningUserForm() {
-    document.getElementById('newUserForm').classList.add('hidden');
-    document.getElementById('returningUserForm').classList.remove('hidden');
-    document.getElementById('newUserBtn').classList.remove('active');
-    document.getElementById('returningUserBtn').classList.add('active');
-    document.getElementById('loginSubtext').textContent = 'Welcome back! Please login';
-    populateUserNamesList();
-}
-
-async function populateUserNamesList() {
-    const datalist = document.getElementById('userNamesList');
-    datalist.innerHTML = '';
-    
-    try {
-        const { data: users, error } = await supabase
-            .from('users')
-            .select('name')
-            .order('name');
-        
-        if (error) throw error;
-        
-        users.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.name;
-            datalist.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error loading user names:', error);
-    }
-}
-
-async function handleNewUserSignup(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('newUserName').value.trim();
-    const course = document.getElementById('newUserCourse').value.trim();
-    const year = document.getElementById('newUserYear').value;
-    const password = document.getElementById('newUserPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    
-    if (password !== confirmPassword) {
-        alert('Passwords do not match! Please try again.');
-        return;
-    }
-    
-    try {
-        const { data: existingUser } = await supabase
-            .from('users')
-            .select('id')
-            .ilike('name', name)
-            .single();
-        
-        if (existingUser) {
-            alert('A user with this name already exists! Please login or use a different name.');
-            return;
-        }
-        
-        const { data: newUser, error } = await supabase
-            .from('users')
-            .insert([
-                {
-                    name: name,
-                    course: course,
-                    year: year,
-                    password: hashPassword(password)
-                }
-            ])
-            .select()
-            .single();
-        
-        if (error) throw error;
-        
-        const userData = {
-            id: newUser.id,
-            name: name,
-            course: course,
-            year: year
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        
-        alert('Account created successfully! Welcome aboard! 🎉');
-        await showMainApp(userData);
-        
-    } catch (error) {
-        console.error('Signup error:', error);
-        alert('Error creating account. Please try again.');
-    }
-}
-
-async function handleReturningUserLogin(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('returningUserName').value.trim();
-    const password = document.getElementById('returningUserPassword').value;
-    const errorDiv = document.getElementById('loginError');
-    
-    try {
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .ilike('name', name)
-            .single();
-        
-        if (error || !user) {
-            errorDiv.textContent = 'User not found. Please check your name or create a new account.';
-            errorDiv.classList.add('show');
-            return;
-        }
-        
-        if (user.password !== hashPassword(password)) {
-            errorDiv.textContent = 'Incorrect password. Please try again.';
-            errorDiv.classList.add('show');
-            return;
-        }
-        
-        await supabase
-            .from('users')
-            .update({ last_login: new Date().toISOString() })
-            .eq('id', user.id);
-        
-        errorDiv.classList.remove('show');
-        
-        const userData = {
-            id: user.id,
-            name: user.name,
-            course: user.course,
-            year: user.year
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        await showMainApp(userData);
-        
-    } catch (error) {
-        console.error('Login error:', error);
-        errorDiv.textContent = 'Login failed. Please try again.';
-        errorDiv.classList.add('show');
-    }
-}
-
-async function showMainApp(userData) {
-    const loginPage = document.getElementById('loginPage');
-    const mainApp = document.getElementById('mainApp');
-    
-    loginPage.classList.add('hidden');
-    mainApp.classList.remove('hidden');
-    
-    displayUserInfo(userData);
-    await loadUserProgress(userData.id);
-    updateHomeStats();
-    updateCategoryProgress();
-}
-
 function displayUserInfo(userData) {
     const userInfoDiv = document.getElementById('userInfo');
     userInfoDiv.innerHTML = `
@@ -214,767 +126,1023 @@ function displayUserInfo(userData) {
         <button class="logout-btn" onclick="logout()">🚪 Logout</button>
     `;
 }
-
-async function loadUserProgress(userId) {
-    try {
-        const { data: progressData, error } = await supabase
-            .from('user_progress')
-            .select('*')
-            .eq('user_id', userId);
-        
-        if (error) throw error;
-        
-        const progress = {
-            asl: {
-                learned: { alphabet: [], numbers: [], greetings: [], common: [] },
-                totalScore: 0,
-                quizzesTaken: 0,
-                achievements: []
-            },
-            fsl: {
-                learned: { alphabet: [], numbers: [], greetings: [], common: [] },
-                totalScore: 0,
-                quizzesTaken: 0,
-                achievements: []
-            }
-        };
-        
-        progressData.forEach(row => {
-            const lang = row.language;
-            const cat = row.category;
-            
-            if (progress[lang]) {
-                progress[lang].learned[cat] = row.signs_learned || [];
-                progress[lang].totalScore += row.total_score || 0;
-                progress[currentLanguage].quizzesTaken += row.quizzes_taken || 0;
-                progress[lang].achievements = row.achievements || [];
-            }
-        });
-        
-        localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
-        
-    } catch (error) {
-        console.error('Error loading progress:', error);
-        const emptyProgress = {
-            asl: {
-                learned: { alphabet: [], numbers: [], greetings: [], common: [] },
-                totalScore: 0,
-                quizzesTaken: 0,
-                achievements: []
-            },
-            fsl: {
-                learned: { alphabet: [], numbers: [], greetings: [], common: [] },
-                totalScore: 0,
-                quizzesTaken: 0,
-                achievements: []
-            }
-        };
-        localStorage.setItem('signLanguageProgress', JSON.stringify(emptyProgress));
+function loadUserProgress(userName) {
+    const users = getAllUsers();
+    const user = users.find(u => u.name === userName);
+    if (user && user.progress) {
+        localStorage.setItem('signLanguageProgress', JSON.stringify(user.progress));
     }
 }
-
-async function saveUserProgress() {
+function saveUserProgress() {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) return;
-    
     const userData = JSON.parse(currentUser);
     const progress = getProgress();
-    
-    try {
-        for (const lang of ['asl', 'fsl']) {
-            const langProgress = progress[lang];
-            
-            for (const category of ['alphabet', 'numbers', 'greetings', 'common']) {
-                await supabase
-                    .from('user_progress')
-                    .upsert({
-                        user_id: userData.id,
-                        language: lang,
-                        category: category,
-                        signs_learned: langProgress.learned[category],
-                        total_score: langProgress.totalScore,
-                        quizzes_taken: langProgress.quizzesTaken,
-                        achievements: langProgress.achievements,
-                        updated_at: new Date().toISOString()
-                    }, {
-                        onConflict: 'user_id,language,category'
-                    });
-            }
-        }
-        
-        console.log('Progress saved to cloud ✅');
-        
-    } catch (error) {
-        console.error('Error saving progress:', error);
+    const users = getAllUsers();
+    const userIndex = users.findIndex(u => u.name === userData.name);
+    if (userIndex !== -1) {
+        users[userIndex].progress = progress;
+        users[userIndex].lastLogin = new Date().toISOString();
+        saveAllUsers(users);
     }
 }
-
-async function logout() {
+function logout() {
     if (confirm('Are you sure you want to logout?')) {
-        await saveUserProgress();
+        saveUserProgress();
         localStorage.removeItem('currentUser');
         localStorage.removeItem('signLanguageProgress');
-        window.location.reload();
+        localStorage.removeItem('currentSection');
+        window.location.href = 'index.html';
     }
 }
-
-window.addEventListener('DOMContentLoaded', async function() {
-    if (await checkUserSession()) {
-        document.getElementById('launchSlide').style.display = 'none';
-        document.getElementById('loginPage').classList.add('hidden');
-    }
-    
-    // Add navigation listeners
-    const navButtons = document.querySelectorAll('.nav-btn');
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const section = this.getAttribute('data-section');
-            navigateToSection(section);
-        });
-    });
+window.addEventListener('beforeunload', function() {
+    saveUserProgress();
 });
-
-window.addEventListener('beforeunload', async function() {
-    await saveUserProgress();
-});
-
-setInterval(async () => {
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-        await saveUserProgress();
-    }
-}, 30000);
-
-/* ===================================
-   SIGN LANGUAGE GAME LOGIC
-   =================================== */
-
-// Sign language data with emojis as placeholders
-const signLanguageData = {
+let currentLanguage = 'asl'; 
+let currentCategory = null;
+let currentSignIndex = 0;
+let currentSection = 'home';
+let quizScore = 0;
+let currentQuestionIndex = 0;
+let currentQuiz = null;
+const fslAlphabetSigns = [
+    { id: 'a', name: 'A', visual: '✊', description: 'Closed fist, similar to ASL but thumb may be more forward' },
+    { id: 'b', name: 'B', visual: '🖐️', description: 'Open hand with fingers together, thumb folded' },
+    { id: 'c', name: 'C', visual: '👌', description: 'Curved hand forming C shape' },
+    { id: 'd', name: 'D', visual: '☝️', description: 'Index finger pointing up, middle touches thumb' },
+    { id: 'e', name: 'E', visual: '✊', description: 'Closed fist with fingers curled inward' },
+    { id: 'f', name: 'F', visual: '👌', description: 'Thumb and index form circle, other fingers extended' },
+    { id: 'g', name: 'G', visual: '👈', description: 'Index and thumb point sideways' },
+    { id: 'h', name: 'H', visual: '🤞', description: 'Index and middle extended horizontally' },
+    { id: 'i', name: 'I', visual: '🤙', description: 'Pinky extended upward' },
+    { id: 'j', name: 'J', visual: '🤙', description: 'Pinky draws J shape in air' },
+    { id: 'k', name: 'K', visual: '✌️', description: 'Index and middle up, thumb between' },
+    { id: 'l', name: 'L', visual: '👍', description: 'L shape with index and thumb' },
+    { id: 'm', name: 'M', visual: '✊', description: 'Thumb tucked under three fingers' },
+    { id: 'n', name: 'N', visual: '✊', description: 'Thumb under first two fingers' },
+    { id: 'o', name: 'O', visual: '👌', description: 'Fingers form O with thumb' },
+    { id: 'p', name: 'P', visual: '👇', description: 'K shape pointing downward' },
+    { id: 'q', name: 'Q', visual: '👇', description: 'G shape pointing down' },
+    { id: 'r', name: 'R', visual: '🤞', description: 'Crossed index and middle fingers' },
+    { id: 's', name: 'S', visual: '✊', description: 'Fist with thumb over fingers' },
+    { id: 't', name: 'T', visual: '👊', description: 'Thumb between index and middle' },
+    { id: 'u', name: 'U', visual: '✌️', description: 'Index and middle together, pointing up' },
+    { id: 'v', name: 'V', visual: '✌️', description: 'Index and middle spread in V' },
+    { id: 'w', name: 'W', visual: '🤟', description: 'Three fingers extended (index, middle, ring)' },
+    { id: 'x', name: 'X', visual: '☝️', description: 'Index finger bent like hook' },
+    { id: 'y', name: 'Y', visual: '🤙', description: 'Thumb and pinky extended (hang loose)' },
+    { id: 'z', name: 'Z', visual: '☝️', description: 'Index traces Z in the air' }
+];
+const fslNumberSigns = [
+    { id: '0', name: '0', visual: '👌', description: 'O shape with thumb and fingers' },
+    { id: '1', name: '1', visual: '☝️', description: 'Index finger pointing up' },
+    { id: '2', name: '2', visual: '✌️', description: 'Index and middle fingers up' },
+    { id: '3', name: '3', visual: '🤟', description: 'Thumb, index, middle up' },
+    { id: '4', name: '4', visual: '🖖', description: 'Four fingers extended' },
+    { id: '5', name: '5', visual: '🖐️', description: 'All five fingers spread open' },
+    { id: '6', name: '6', visual: '🤙', description: 'Thumb and pinky touch, others folded' },
+    { id: '7', name: '7', visual: '🤘', description: 'Ring and pinky touch thumb' },
+    { id: '8', name: '8', visual: '🤞', description: 'Middle and ring touch thumb' },
+    { id: '9', name: '9', visual: '👌', description: 'Index touches thumb, four fingers up' },
+    { id: '10', name: '10', visual: '👊', description: 'Fist with slight shake' }
+];
+const fslGreetingSigns = [
+    { id: 'hello', name: 'Kumusta (Hello)', visual: '👋', description: 'Wave hand or touch forehead then move forward' },
+    { id: 'goodbye', name: 'Paalam (Goodbye)', visual: '👋', description: 'Wave hand back and forth' },
+    { id: 'please', name: 'Paki (Please)', visual: '🤚', description: 'Hand flat, circular motion on chest' },
+    { id: 'thankyou', name: 'Salamat (Thank You)', visual: '😊', description: 'Hand moves from lips/chin forward' },
+    { id: 'sorry', name: 'Pasensya (Sorry)', visual: '✊', description: 'Fist circles on chest, apologetic' },
+    { id: 'yes', name: 'Oo (Yes)', visual: '👍', description: 'Nod fist or head movement' },
+    { id: 'no', name: 'Hindi (No)', visual: '☝️', description: 'Shake head or finger wag' },
+    { id: 'help', name: 'Tulong (Help)', visual: '🆘', description: 'One hand supports/lifts the other' },
+    { id: 'welcome', name: 'Walang Anuman (Welcome)', visual: '🤗', description: 'Open arms gesture' },
+    { id: 'goodmorning', name: 'Magandang Umaga', visual: '🌅', description: 'Sign for "good" + "morning"' }
+];
+const fslCommonSigns = [
+    { id: 'eat', name: 'Kain (Eat)', visual: '🍽️', description: 'Fingers to mouth repeatedly' },
+    { id: 'drink', name: 'Inom (Drink)', visual: '🥤', description: 'Hand mimics holding cup to mouth' },
+    { id: 'sleep', name: 'Tulog (Sleep)', visual: '😴', description: 'Hand closes near face/cheek' },
+    { id: 'home', name: 'Bahay (Home)', visual: '🏠', description: 'Hands form roof shape' },
+    { id: 'work', name: 'Trabaho (Work)', visual: '💼', description: 'Fists tap or move in working motion' },
+    { id: 'school', name: 'Eskwela (School)', visual: '🏫', description: 'Hands clap or book shape' },
+    { id: 'friend', name: 'Kaibigan (Friend)', visual: '👥', description: 'Hook fingers together or shake' },
+    { id: 'family', name: 'Pamilya (Family)', visual: '👨‍👩‍👧‍👦', description: 'F-hands or arms encircle' },
+    { id: 'happy', name: 'Masaya (Happy)', visual: '😊', description: 'Smile gesture, hands brush chest up' },
+    { id: 'sad', name: 'Malungkot (Sad)', visual: '😢', description: 'Hands slide down face' },
+    { id: 'love', name: 'Mahal (Love)', visual: '❤️', description: 'Hands cross over heart' },
+    { id: 'beautiful', name: 'Maganda (Beautiful)', visual: '✨', description: 'Hand circles face appreciatively' }
+];
+const aslAlphabetSigns = [
+    { id: 'a', name: 'A', visual: '✊', description: 'Closed fist with thumb to the side' },
+    { id: 'b', name: 'B', visual: '🖐️', description: 'Open hand, fingers together, thumb across palm' },
+    { id: 'c', name: 'C', visual: '👌', description: 'Curved hand forming a C shape' },
+    { id: 'd', name: 'D', visual: '☝️', description: 'Index finger up, other fingers touching thumb' },
+    { id: 'e', name: 'E', visual: '✊', description: 'Closed fist, fingers curled down' },
+    { id: 'f', name: 'F', visual: '👌', description: 'Index and thumb touching, other fingers up' },
+    { id: 'g', name: 'G', visual: '👈', description: 'Index finger and thumb extended sideways' },
+    { id: 'h', name: 'H', visual: '🤞', description: 'Index and middle finger extended sideways' },
+    { id: 'i', name: 'I', visual: '🤙', description: 'Pinky finger extended up' },
+    { id: 'j', name: 'J', visual: '🤙', description: 'Pinky draws a J in the air' },
+    { id: 'k', name: 'K', visual: '✌️', description: 'Index and middle finger up, thumb between them' },
+    { id: 'l', name: 'L', visual: '👍', description: 'Index finger up, thumb extended' },
+    { id: 'm', name: 'M', visual: '✊', description: 'Thumb under three fingers' },
+    { id: 'n', name: 'N', visual: '✊', description: 'Thumb under two fingers' },
+    { id: 'o', name: 'O', visual: '👌', description: 'Fingers and thumb form O shape' },
+    { id: 'p', name: 'P', visual: '👇', description: 'Index and middle down, like K but downward' },
+    { id: 'q', name: 'Q', visual: '👇', description: 'Index and thumb down, like G but downward' },
+    { id: 'r', name: 'R', visual: '🤞', description: 'Index and middle crossed' },
+    { id: 's', name: 'S', visual: '✊', description: 'Closed fist, thumb over fingers' },
+    { id: 't', name: 'T', visual: '👊', description: 'Thumb between index and middle' },
+    { id: 'u', name: 'U', visual: '✌️', description: 'Index and middle up together' },
+    { id: 'v', name: 'V', visual: '✌️', description: 'Index and middle apart, forming V' },
+    { id: 'w', name: 'W', visual: '🤟', description: 'Index, middle, and ring up' },
+    { id: 'x', name: 'X', visual: '☝️', description: 'Index finger bent like hook' },
+    { id: 'y', name: 'Y', visual: '🤙', description: 'Thumb and pinky extended' },
+    { id: 'z', name: 'Z', visual: '☝️', description: 'Index finger draws Z in air' }
+];
+const aslNumberSigns = [
+    { id: '0', name: '0', visual: '👌', description: 'Circle with thumb and index' },
+    { id: '1', name: '1', visual: '☝️', description: 'Index finger up' },
+    { id: '2', name: '2', visual: '✌️', description: 'Index and middle up' },
+    { id: '3', name: '3', visual: '🤟', description: 'Thumb, index, and middle up' },
+    { id: '4', name: '4', visual: '🖖', description: 'Four fingers up, thumb down' },
+    { id: '5', name: '5', visual: '🖐️', description: 'All five fingers spread' },
+    { id: '6', name: '6', visual: '🤙', description: 'Thumb and pinky touch, three up' },
+    { id: '7', name: '7', visual: '🤘', description: 'Ring and pinky touch thumb, two up' },
+    { id: '8', name: '8', visual: '🤞', description: 'Middle and ring touch thumb, two up' },
+    { id: '9', name: '9', visual: '👌', description: 'Index touches thumb, four up' },
+    { id: '10', name: '10', visual: '👊', description: 'Shake fist or show thumb (A + wiggle)' }
+];
+const aslGreetingSigns = [
+    { id: 'hello', name: 'Hello', visual: '👋', description: 'Wave hand side to side' },
+    { id: 'goodbye', name: 'Goodbye', visual: '👋', description: 'Wave hand up and down' },
+    { id: 'please', name: 'Please', visual: '🤚', description: 'Rub hand in circle on chest' },
+    { id: 'thankyou', name: 'Thank You', visual: '😊', description: 'Hand moves from chin forward' },
+    { id: 'sorry', name: 'Sorry', visual: '✊', description: 'Fist circles on chest' },
+    { id: 'yes', name: 'Yes', visual: '👍', description: 'Nod fist up and down' },
+    { id: 'no', name: 'No', visual: '☝️', description: 'Index and middle snap together' },
+    { id: 'help', name: 'Help', visual: '🆘', description: 'One hand lifts the other' }
+];
+const aslCommonSigns = [
+    { id: 'eat', name: 'Eat', visual: '🍽️', description: 'Fingers to mouth repeatedly' },
+    { id: 'drink', name: 'Drink', visual: '🥤', description: 'C hand to mouth like holding cup' },
+    { id: 'sleep', name: 'Sleep', visual: '😴', description: 'Hand closes near cheek' },
+    { id: 'home', name: 'Home', visual: '🏠', description: 'Fingertips touch at roof shape' },
+    { id: 'work', name: 'Work', visual: '💼', description: 'Fists tap together' },
+    { id: 'school', name: 'School', visual: '🏫', description: 'Clap hands twice' },
+    { id: 'friend', name: 'Friend', visual: '👥', description: 'Hook index fingers together twice' },
+    { id: 'family', name: 'Family', visual: '👨‍👩‍👧‍👦', description: 'F hands circle to connect' },
+    { id: 'happy', name: 'Happy', visual: '😊', description: 'Brush chest upward twice' },
+    { id: 'sad', name: 'Sad', visual: '😢', description: 'Hands slide down face' }
+];
+const languageData = {
     asl: {
-        alphabet: [
-            { sign: '🅰️', name: 'A', description: 'Closed fist with thumb to the side' },
-            { sign: '🅱️', name: 'B', description: 'Flat hand with fingers up and together' },
-            { sign: '🌊', name: 'C', description: 'Curved hand forming letter C' },
-            { sign: '☝️', name: 'D', description: 'Index finger up, other fingers touching thumb' },
-            { sign: '✋', name: 'E', description: 'Fingers curved down, touching thumb' },
-            { sign: '👌', name: 'F', description: 'Thumb and index form circle, others up' },
-            { sign: '👍', name: 'G', description: 'Closed fist, thumb pointing sideways' },
-            { sign: '✌️', name: 'H', description: 'Index and middle finger sideways' },
-            { sign: '🤙', name: 'I', description: 'Pinky up, others closed' },
-            { sign: '🤞', name: 'J', description: 'Pinky up, tracing J shape' },
-            { sign: '🖖', name: 'K', description: 'Index and middle up in V, thumb between' },
-            { sign: '👆', name: 'L', description: 'L shape with thumb and index' },
-            { sign: '👊', name: 'M', description: 'Closed fist, thumb under fingers' },
-            { sign: '🤟', name: 'N', description: 'Thumb under first two fingers' },
-            { sign: '⭕', name: 'O', description: 'Fingers form circle' },
-            { sign: '🫰', name: 'P', description: 'Like K but pointing down' },
-            { sign: '👇', name: 'Q', description: 'Fist pointing down, thumb down' },
-            { sign: '🫱', name: 'R', description: 'Index and middle crossed' },
-            { sign: '✊', name: 'S', description: 'Closed fist, thumb over fingers' },
-            { sign: '🫳', name: 'T', description: 'Thumb between index and middle' },
-            { sign: '🤘', name: 'U', description: 'Index and middle together, pointing up' },
-            { sign: '🫴', name: 'V', description: 'Index and middle apart in V' },
-            { sign: '🫷', name: 'W', description: 'Three fingers up' },
-            { sign: '🫸', name: 'X', description: 'Bent index finger' },
-            { sign: '🤙', name: 'Y', description: 'Thumb and pinky out' },
-            { sign: '👉', name: 'Z', description: 'Index finger traces Z' }
-        ],
-        numbers: [
-            { sign: '👊', name: '0', description: 'Closed fist forming O' },
-            { sign: '☝️', name: '1', description: 'Index finger up' },
-            { sign: '✌️', name: '2', description: 'Index and middle up' },
-            { sign: '🤟', name: '3', description: 'Thumb, index, and middle up' },
-            { sign: '🖖', name: '4', description: 'Four fingers up, thumb in' },
-            { sign: '✋', name: '5', description: 'All five fingers spread' },
-            { sign: '🤙', name: '6', description: 'Thumb and pinky touching' },
-            { sign: '👌', name: '7', description: 'Ring, middle, index up' },
-            { sign: '🤞', name: '8', description: 'Thumb, middle, ring up' },
-            { sign: '👍', name: '9', description: 'Thumb, ring, pinky up' },
-            { sign: '🙌', name: '10', description: 'Shake fist or show 1-0' }
-        ],
-        greetings: [
-            { sign: '👋', name: 'Hello', description: 'Wave hand back and forth' },
-            { sign: '🙋', name: 'Hi', description: 'Open palm, wave fingers' },
-            { sign: '😊', name: 'Good Morning', description: 'Flat hand from mouth moving up' },
-            { sign: '🌅', name: 'Good Afternoon', description: 'Flat hand at elbow level' },
-            { sign: '🌙', name: 'Good Night', description: 'Flat hand moving down' },
-            { sign: '🙏', name: 'Thank You', description: 'Flat hand from chin forward' },
-            { sign: '🤝', name: 'Nice to meet you', description: 'Shake hands gesture' },
-            { sign: '👋', name: 'Goodbye', description: 'Wave goodbye' },
-            { sign: '👍', name: 'Good', description: 'Thumb up' },
-            { sign: '❤️', name: 'Love', description: 'Cross arms over chest' }
-        ],
-        common: [
-            { sign: '👨', name: 'Man', description: 'Thumb from forehead to chin' },
-            { sign: '👩', name: 'Woman', description: 'Thumb from chin to chest' },
-            { sign: '👶', name: 'Baby', description: 'Rock arms like holding baby' },
-            { sign: '🏠', name: 'Home', description: 'Fingertips touch forming roof' },
-            { sign: '🍎', name: 'Eat', description: 'Fingertips to mouth' },
-            { sign: '💧', name: 'Water', description: 'W shape at mouth' },
-            { sign: '🚗', name: 'Car', description: 'Hands steering wheel' },
-            { sign: '🏫', name: 'School', description: 'Clap hands twice' },
-            { sign: '📚', name: 'Book', description: 'Palms together, open like book' },
-            { sign: '⏰', name: 'Time', description: 'Point to wrist' },
-            { sign: '✅', name: 'Yes', description: 'Fist nods like head' },
-            { sign: '❌', name: 'No', description: 'Index and middle snap shut' },
-            { sign: '❓', name: 'What', description: 'Shake open hands side to side' },
-            { sign: '❔', name: 'Where', description: 'Point and move side to side' },
-            { sign: '🤔', name: 'Why', description: 'Touch forehead, move forward' }
-        ]
+        alphabet: aslAlphabetSigns,
+        numbers: aslNumberSigns,
+        greetings: aslGreetingSigns,
+        common: aslCommonSigns,
+        fullName: 'American Sign Language',
+        shortName: 'ASL',
+        flag: '🇺🇸'
     },
     fsl: {
-        alphabet: [
-            { sign: '🅰️', name: 'A', description: 'Closed fist with thumb on side' },
-            { sign: '🅱️', name: 'B', description: 'Flat hand, fingers up together' },
-            { sign: '🌊', name: 'C', description: 'Curved hand forming C' },
-            { sign: '☝️', name: 'D', description: 'Index up, others closed' },
-            { sign: '✋', name: 'E', description: 'Curved fingers touching thumb' },
-            { sign: '👌', name: 'F', description: 'Thumb and index circle' },
-            { sign: '👍', name: 'G', description: 'Fist, thumb sideways' },
-            { sign: '✌️', name: 'H', description: 'Index and middle sideways' },
-            { sign: '🤙', name: 'I', description: 'Pinky up only' },
-            { sign: '🤞', name: 'J', description: 'Pinky traces J' },
-            { sign: '🖖', name: 'K', description: 'V with thumb between' },
-            { sign: '👆', name: 'L', description: 'L shape' },
-            { sign: '👊', name: 'M', description: 'Fist thumb under' },
-            { sign: '🤟', name: 'N', description: 'Thumb under two fingers' },
-            { sign: '⭕', name: 'O', description: 'Circle with fingers' },
-            { sign: '🫰', name: 'P', description: 'K pointing down' },
-            { sign: '👇', name: 'Q', description: 'Fist pointing down' },
-            { sign: '🫱', name: 'R', description: 'Crossed fingers' },
-            { sign: '✊', name: 'S', description: 'Fist thumb over' },
-            { sign: '🫳', name: 'T', description: 'Thumb between fingers' },
-            { sign: '🤘', name: 'U', description: 'Two fingers together up' },
-            { sign: '🫴', name: 'V', description: 'Two fingers apart V' },
-            { sign: '🫷', name: 'W', description: 'Three fingers up' },
-            { sign: '🫸', name: 'X', description: 'Bent index' },
-            { sign: '🤙', name: 'Y', description: 'Thumb and pinky out' },
-            { sign: '👉', name: 'Z', description: 'Trace Z with finger' }
-        ],
-        numbers: [
-            { sign: '👊', name: '0', description: 'Closed fist' },
-            { sign: '☝️', name: '1', description: 'One finger up' },
-            { sign: '✌️', name: '2', description: 'Two fingers' },
-            { sign: '🤟', name: '3', description: 'Three fingers' },
-            { sign: '🖖', name: '4', description: 'Four fingers' },
-            { sign: '✋', name: '5', description: 'Five spread' },
-            { sign: '🤙', name: '6', description: 'Thumb and pinky' },
-            { sign: '👌', name: '7', description: 'Three fingers up' },
-            { sign: '🤞', name: '8', description: 'Three different fingers' },
-            { sign: '👍', name: '9', description: 'Thumb and two fingers' },
-            { sign: '🙌', name: '10', description: 'Both hands or 1-0' }
-        ],
-        greetings: [
-            { sign: '👋', name: 'Kumusta (Hello)', description: 'Wave hand' },
-            { sign: '🙋', name: 'Magandang Umaga (Good Morning)', description: 'Hand from mouth up' },
-            { sign: '🌅', name: 'Magandang Hapon (Good Afternoon)', description: 'Hand at elbow' },
-            { sign: '🌙', name: 'Magandang Gabi (Good Evening)', description: 'Hand down' },
-            { sign: '🙏', name: 'Salamat (Thank You)', description: 'Hand from chin forward' },
-            { sign: '🤝', name: 'Maligayang pagkakilala (Nice to meet you)', description: 'Handshake' },
-            { sign: '👋', name: 'Paalam (Goodbye)', description: 'Wave' },
-            { sign: '👍', name: 'Mabuti (Good)', description: 'Thumbs up' },
-            { sign: '❤️', name: 'Mahal (Love)', description: 'Arms crossed on chest' },
-            { sign: '😊', name: 'Oo (Yes)', description: 'Nod fist' }
-        ],
-        common: [
-            { sign: '👨', name: 'Lalaki (Man)', description: 'Thumb forehead to chin' },
-            { sign: '👩', name: 'Babae (Woman)', description: 'Thumb chin to chest' },
-            { sign: '👶', name: 'Sanggol (Baby)', description: 'Rock arms' },
-            { sign: '🏠', name: 'Bahay (Home)', description: 'Roof shape' },
-            { sign: '🍎', name: 'Kain (Eat)', description: 'Hand to mouth' },
-            { sign: '💧', name: 'Tubig (Water)', description: 'W at mouth' },
-            { sign: '🚗', name: 'Sasakyan (Car)', description: 'Steering motion' },
-            { sign: '🏫', name: 'Paaralan (School)', description: 'Clap twice' },
-            { sign: '📚', name: 'Libro (Book)', description: 'Open palms like book' },
-            { sign: '⏰', name: 'Oras (Time)', description: 'Point to wrist' },
-            { sign: '✅', name: 'Oo (Yes)', description: 'Fist nods' },
-            { sign: '❌', name: 'Hindi (No)', description: 'Fingers snap' },
-            { sign: '❓', name: 'Ano (What)', description: 'Shake hands' },
-            { sign: '❔', name: 'Saan (Where)', description: 'Point side to side' },
-            { sign: '🤔', name: 'Bakit (Why)', description: 'Touch forehead forward' }
-        ]
+        alphabet: fslAlphabetSigns,
+        numbers: fslNumberSigns,
+        greetings: fslGreetingSigns,
+        common: fslCommonSigns,
+        fullName: 'Filipino Sign Language',
+        shortName: 'FSL',
+        flag: '🇵🇭'
     }
 };
-
-// Current state
-let currentLanguage = 'asl';
-let currentCategory = '';
-let currentSignIndex = 0;
-let currentQuiz = {
-    category: '',
-    questions: [],
-    currentQuestion: 0,
-    score: 0,
-    isActive: false
-};
-let rhythmGameState = {
-    isActive: false,
-    score: 0,
-    combo: 0,
-    maxCombo: 0,
-    interval: null
-};
-
-// Helper functions
+let signCategories = languageData[currentLanguage];
+async function switchLanguage(language) {
+    currentLanguage = language;
+    signCategories = languageData[language];
+    localStorage.setItem('selectedLanguage', language);
+    if (window.StatsDB && window.StatsDB.save) {
+        await window.StatsDB.save();
+    }
+    updateLanguageUI();
+    if (currentCategory) {
+        hideLesson();
+    }
+    updateCategoryProgress();
+    updateHomeStats();
+    const langName = languageData[language].fullName;
+    alert(`✅ Language changed to ${langName}!`);
+}
+function updateLanguageUI() {
+    const lang = languageData[currentLanguage];
+    const welcomeText = document.getElementById('welcomeText');
+    if (welcomeText) {
+        welcomeText.textContent = `Learn the basics of ${lang.fullName} (${lang.shortName}) through interactive lessons and fun games.`;
+    }
+    const rhythmTitle = document.getElementById('rhythmGameTitle');
+    if (rhythmTitle) {
+        rhythmTitle.textContent = `🎵 ${lang.shortName} Rhythm Game`;
+    }
+    updateCategoryDescriptions();
+}
+function updateCategoryDescriptions() {
+    const lang = languageData[currentLanguage];
+    const shortName = lang.shortName;
+    const alphabetCard = document.querySelector('.category-card[data-category="alphabet"]');
+    const numbersCard = document.querySelector('.category-card[data-category="numbers"]');
+    const greetingsCard = document.querySelector('.category-card[data-category="greetings"]');
+    const commonCard = document.querySelector('.category-card[data-category="common"]');
+    if (alphabetCard) {
+        alphabetCard.querySelector('p').textContent = `Learn A-Z in ${shortName}`;
+    }
+    if (numbersCard) {
+        numbersCard.querySelector('p').textContent = `Learn 0-10 in ${shortName}`;
+    }
+    if (greetingsCard) {
+        greetingsCard.querySelector('p').textContent = `Common greetings`;
+    }
+    if (commonCard) {
+        commonCard.querySelector('p').textContent = `Everyday vocabulary`;
+    }
+}
+window.addEventListener('DOMContentLoaded', function() {
+    const savedLanguage = localStorage.getItem('selectedLanguage');
+    if (savedLanguage && languageData[savedLanguage]) {
+        currentLanguage = savedLanguage;
+        signCategories = languageData[currentLanguage];
+        const select = document.getElementById('languageSelect');
+        if (select) {
+            select.value = savedLanguage;
+        }
+        updateLanguageUI();
+    }
+});
 function getProgress() {
-    const progress = localStorage.getItem('signLanguageProgress');
-    if (progress) {
-        return JSON.parse(progress);
-    }
-    return {
+    const defaultProgress = {
         asl: {
             learned: { alphabet: [], numbers: [], greetings: [], common: [] },
             totalScore: 0,
             quizzesTaken: 0,
-            achievements: []
+            achievements: [],
+            rhythmGameStats: {
+                totalGamesPlayed: 0,
+                highScore: 0,
+                totalScore: 0
+            }
         },
         fsl: {
             learned: { alphabet: [], numbers: [], greetings: [], common: [] },
             totalScore: 0,
             quizzesTaken: 0,
-            achievements: []
+            achievements: [],
+            rhythmGameStats: {
+                totalGamesPlayed: 0,
+                highScore: 0,
+                totalScore: 0
+            }
         }
     };
-}
-
-function saveProgress(progress) {
-    localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
-    saveUserProgress();
-}
-
-function markSignAsLearned(sign) {
-    const progress = getProgress();
-    if (!progress[currentLanguage].learned[currentCategory].includes(sign)) {
-        progress[currentLanguage].learned[currentCategory].push(sign);
-        saveProgress(progress);
+    const saved = localStorage.getItem('signLanguageProgress');
+    if (!saved) return defaultProgress;
+    const progress = JSON.parse(saved);
+    if (!progress.asl && !progress.fsl) {
+        const migratedProgress = {
+            asl: {
+                learned: progress.learned || defaultProgress.asl.learned,
+                totalScore: progress.totalScore || 0,
+                quizzesTaken: progress.quizzesTaken || 0,
+                achievements: progress.achievements || [],
+                rhythmGameStats: progress.rhythmGameStats || defaultProgress.asl.rhythmGameStats
+            },
+            fsl: defaultProgress.fsl
+        };
+        return migratedProgress;
     }
-}
-
-// Navigation
-function navigateToSection(section) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    
-    document.getElementById(section).classList.add('active');
-    const navBtn = document.querySelector(`[data-section="${section}"]`);
-    if (navBtn) navBtn.classList.add('active');
-    
-    if (section === 'practice') {
-        showPracticeHome();
-    }
-}
-
-function switchLanguage(lang) {
-    currentLanguage = lang;
-    const welcomeText = document.getElementById('welcomeText');
-    if (lang === 'asl') {
-        welcomeText.textContent = 'Learn the basics of American Sign Language (ASL) through interactive lessons and fun games.';
-    } else {
-        welcomeText.textContent = 'Learn the basics of Filipino Sign Language (FSL) through interactive lessons and fun games.';
-    }
-    updateHomeStats();
-    updateCategoryProgress();
-}
-
-// Stats update
-function updateHomeStats() {
-    const progress = getProgress();
-    const langProgress = progress[currentLanguage];
-    
-    let totalLearned = 0;
-    for (let category in langProgress.learned) {
-        totalLearned += langProgress.learned[category].length;
-    }
-    
-    document.getElementById('totalLearned').textContent = totalLearned;
-    document.getElementById('totalScore').textContent = langProgress.totalScore;
-    document.getElementById('quizzesTaken').textContent = langProgress.quizzesTaken;
-}
-
-function updateCategoryProgress() {
-    const progress = getProgress();
-    const langProgress = progress[currentLanguage];
-    
-    const categories = ['alphabet', 'numbers', 'greetings', 'common'];
-    const categoryTotals = {
-        'alphabet': 26,
-        'numbers': 11,
-        'greetings': 10,
-        'common': 15
+    const mergedProgress = {
+        asl: {
+            learned: progress.asl?.learned || defaultProgress.asl.learned,
+            totalScore: progress.asl?.totalScore || 0,
+            quizzesTaken: progress.asl?.quizzesTaken || 0,
+            achievements: progress.asl?.achievements || [],
+            rhythmGameStats: progress.asl?.rhythmGameStats || defaultProgress.asl.rhythmGameStats
+        },
+        fsl: {
+            learned: progress.fsl?.learned || defaultProgress.fsl.learned,
+            totalScore: progress.fsl?.totalScore || 0,
+            quizzesTaken: progress.fsl?.quizzesTaken || 0,
+            achievements: progress.fsl?.achievements || [],
+            rhythmGameStats: progress.fsl?.rhythmGameStats || defaultProgress.fsl.rhythmGameStats
+        }
     };
-    
-    categories.forEach(category => {
-        const learned = langProgress.learned[category].length;
-        const total = categoryTotals[category];
-        const percentage = (learned / total) * 100;
-        
-        const progressBar = document.getElementById(`progress-${category}`);
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
+    return mergedProgress;
+}
+async function markSignLearned(category, signId) {
+    const progress = getProgress();
+    const isNewSign = !progress[currentLanguage].learned[category].includes(signId);
+    if (isNewSign) {
+        progress[currentLanguage].learned[category].push(signId);
+        await checkAchievements(progress[currentLanguage]);
+        const updatedProgress = getProgress();
+        saveProgress(updatedProgress);
+    }
+}
+async function updateQuizStats(score, total) {
+    const progress = getProgress();
+    progress[currentLanguage].totalScore += score;
+    progress[currentLanguage].quizzesTaken += 1;
+    await checkAchievements(progress[currentLanguage]);
+    const updatedProgress = getProgress();
+    saveProgress(updatedProgress);
+}
+async function updateHomeStats() {
+    const progress = getProgress();
+    const langProgress = progress[currentLanguage];
+    if (!langProgress) {
+        console.error('Language progress not found for:', currentLanguage);
+        return;
+    }
+    const totalLearned = Object.values(langProgress.learned).reduce((sum, arr) => sum + arr.length, 0);
+    const totalLearnedEl = document.getElementById('totalLearned');
+    const totalScoreEl = document.getElementById('totalScore');
+    const quizzesTakenEl = document.getElementById('quizzesTaken');
+    if (totalLearnedEl) totalLearnedEl.textContent = totalLearned;
+    if (totalScoreEl) totalScoreEl.textContent = langProgress.totalScore || 0;
+    if (quizzesTakenEl) quizzesTakenEl.textContent = langProgress.quizzesTaken || 0;
+    await checkAchievements(langProgress, false);
+}
+async function navigateToSection(sectionName) {
+    // update visible section and active button
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(sectionName).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.section === sectionName) {
+            btn.classList.add('active');
         }
     });
-}
 
-// Lesson functions
+    // remember for refresh
+    localStorage.setItem('currentSection', sectionName);
+    currentSection = sectionName;
+
+    if (sectionName === 'home') {
+        await updateHomeStats();
+    } else if (sectionName === 'practice') {
+        showPracticeHome();
+    } else if (sectionName === 'progress') {
+        await updateProgressDisplay();
+    } else if (sectionName === 'lessons') {
+        updateCategoryProgress();
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            navigateToSection(this.dataset.section);
+        });
+    });
+
+    // restore last open tab (section) if available
+    const saved = localStorage.getItem('currentSection');
+    if (saved && document.getElementById(saved)) {
+        // call navigateToSection so UI state updates correctly
+        navigateToSection(saved);
+    }
+});
 function showLesson(category) {
     currentCategory = category;
     currentSignIndex = 0;
-    
+
+    // hide the initial headings/category list
+    const heading = document.querySelector('#lessons h2');
+    const sub = document.querySelector('#lessons p');
+    if (heading) heading.style.display = 'none';
+    if (sub) sub.style.display = 'none';
+
     document.querySelector('.lesson-categories').style.display = 'none';
     document.getElementById('lessonDetail').classList.remove('hidden');
-    
-    const signs = signLanguageData[currentLanguage][category];
-    document.getElementById('lessonTitle').textContent = 
-        category.charAt(0).toUpperCase() + category.slice(1);
-    
+    const titles = {
+        alphabet: 'Alphabet (A-Z)',
+        numbers: 'Numbers (0-10)',
+        greetings: 'Greetings & Manners',
+        common: 'Common Words'
+    };
+    document.getElementById('lessonTitle').textContent = titles[category];
     displayCurrentSign();
 }
-
 function hideLesson() {
-    document.querySelector('.lesson-categories').style.display = 'grid';
-    document.getElementById('lessonDetail').classList.add('hidden');
-}
+    // bring back heading & subtitle
+    const heading = document.querySelector('#lessons h2');
+    const sub = document.querySelector('#lessons p');
+    if (heading) heading.style.display = '';
+    if (sub) sub.style.display = '';
 
-function displayCurrentSign() {
-    const signs = signLanguageData[currentLanguage][currentCategory];
+    document.querySelector('.lesson-categories').style.display = 'flex';
+    document.getElementById('lessonDetail').classList.add('hidden');
+    currentCategory = null;
+}
+async function displayCurrentSign() {
+    if (!currentCategory) return;
+    const signs = signCategories[currentCategory];
     const sign = signs[currentSignIndex];
-    
-    document.getElementById('signVisual').textContent = sign.sign;
+    document.getElementById('signVisual').textContent = sign.visual;
     document.getElementById('signName').textContent = sign.name;
     document.getElementById('signDescription').textContent = sign.description;
-    document.getElementById('cardCounter').textContent = 
-        `${currentSignIndex + 1} / ${signs.length}`;
-    
-    markSignAsLearned(sign.name);
-    updateHomeStats();
+    document.getElementById('cardCounter').textContent = `${currentSignIndex + 1} / ${signs.length}`;
+    document.getElementById('prevBtn').disabled = currentSignIndex === 0;
+    document.getElementById('nextBtn').disabled = currentSignIndex === signs.length - 1;
+    await markSignLearned(currentCategory, sign.id);
     updateCategoryProgress();
 }
-
-function nextSign() {
-    const signs = signLanguageData[currentLanguage][currentCategory];
-    if (currentSignIndex < signs.length - 1) {
-        currentSignIndex++;
-        displayCurrentSign();
-    }
-}
-
 function previousSign() {
     if (currentSignIndex > 0) {
         currentSignIndex--;
         displayCurrentSign();
     }
 }
-
-// Quiz functions
+function nextSign() {
+    const signs = signCategories[currentCategory];
+    if (currentSignIndex < signs.length - 1) {
+        currentSignIndex++;
+        displayCurrentSign();
+    }
+}
+function updateCategoryProgress() {
+    const progress = getProgress();
+    const langProgress = progress[currentLanguage];
+    if (!langProgress) {
+        console.error('Language progress not found for:', currentLanguage);
+        return;
+    }
+    const validCategories = ['alphabet', 'numbers', 'greetings', 'common'];
+    validCategories.forEach(category => {
+        if (!signCategories[category] || !Array.isArray(signCategories[category])) {
+            return;
+        }
+        const total = signCategories[category].length;
+        const learned = langProgress.learned[category] ? langProgress.learned[category].length : 0;
+        const percentage = Math.round((learned / total) * 100);
+        const progressBar = document.getElementById(`progress-${category}`);
+        if (progressBar) {
+            progressBar.style.width = percentage + '%';
+        }
+    });
+}
 function startQuiz() {
-    const signs = signLanguageData[currentLanguage][currentCategory];
-    
-    // Generate quiz questions
-    currentQuiz.category = currentCategory;
-    currentQuiz.questions = [];
-    currentQuiz.currentQuestion = 0;
-    currentQuiz.score = 0;
-    currentQuiz.isActive = true;
-    
-    // Create 10 random questions
-    for (let i = 0; i < Math.min(10, signs.length); i++) {
-        const correctSign = signs[Math.floor(Math.random() * signs.length)];
-        const wrongSigns = signs
-            .filter(s => s.name !== correctSign.name)
-            .sort(() => 0.5 - Math.random())
+    if (!currentCategory) return;
+    navigateToSection('practice');
+    document.getElementById('practiceHome').classList.add('hidden');
+    document.getElementById('quizResults').classList.add('hidden');
+    document.getElementById('quizView').classList.remove('hidden');
+    const signs = signCategories[currentCategory];
+    currentQuiz = {
+        category: currentCategory,
+        questions: generateQuizQuestions(signs),
+        totalQuestions: 10
+    };
+    quizScore = 0;
+    currentQuestionIndex = 0;
+    const categoryNames = {
+        alphabet: 'Alphabet',
+        numbers: 'Numbers',
+        greetings: 'Greetings',
+        common: 'Common Words'
+    };
+    document.getElementById('quizCategory').textContent = categoryNames[currentCategory];
+    document.getElementById('totalQuestions').textContent = currentQuiz.totalQuestions;
+    showQuizQuestion();
+}
+function generateQuizQuestions(signs) {
+    const questions = [];
+    const numQuestions = Math.min(10, signs.length);
+    const shuffled = [...signs].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < numQuestions; i++) {
+        const correctSign = shuffled[i];
+        const wrongOptions = signs
+            .filter(s => s.id !== correctSign.id)
+            .sort(() => Math.random() - 0.5)
             .slice(0, 3);
-        
-        const options = [correctSign, ...wrongSigns]
-            .sort(() => 0.5 - Math.random());
-        
-        currentQuiz.questions.push({
-            sign: correctSign,
+        const options = [correctSign, ...wrongOptions].sort(() => Math.random() - 0.5);
+        questions.push({
+            correctSign: correctSign,
             options: options
         });
     }
-    
-    // Navigate to practice section and show quiz
-    navigateToSection('practice');
-    document.getElementById('practiceHome').classList.add('hidden');
-    document.getElementById('quizView').classList.remove('hidden');
-    document.getElementById('quizResults').classList.add('hidden');
-    
-    displayQuizQuestion();
+    return questions;
 }
-
-function displayQuizQuestion() {
-    const question = currentQuiz.questions[currentQuiz.currentQuestion];
-    
-    document.getElementById('quizCategory').textContent = 
-        currentQuiz.category.charAt(0).toUpperCase() + currentQuiz.category.slice(1);
-    document.getElementById('currentQuestion').textContent = currentQuiz.currentQuestion + 1;
-    document.getElementById('totalQuestions').textContent = currentQuiz.questions.length;
-    document.getElementById('quizScore').textContent = currentQuiz.score;
-    
-    document.getElementById('quizSignDisplay').textContent = question.sign.sign;
-    
+function showQuizQuestion() {
+    const question = currentQuiz.questions[currentQuestionIndex];
+    document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+    document.getElementById('quizScore').textContent = quizScore;
+    document.getElementById('quizSignDisplay').textContent = question.correctSign.visual;
     const optionsGrid = document.getElementById('optionsGrid');
     optionsGrid.innerHTML = '';
-    
     question.options.forEach(option => {
         const button = document.createElement('button');
         button.className = 'option-btn';
         button.textContent = option.name;
-        button.onclick = () => checkAnswer(option.name, question.sign.name);
+        button.onclick = () => selectAnswer(option.id === question.correctSign.id, button);
         optionsGrid.appendChild(button);
     });
+    document.getElementById('feedback').classList.add('hidden');
 }
-
-function checkAnswer(selected, correct) {
-    const feedback = document.getElementById('feedback');
-    feedback.classList.remove('hidden');
-    
-    if (selected === correct) {
-        feedback.textContent = '✅ Correct!';
-        feedback.style.color = '#4CAF50';
-        currentQuiz.score++;
-    } else {
-        feedback.textContent = `❌ Wrong! The correct answer is: ${correct}`;
-        feedback.style.color = '#f44336';
-    }
-    
-    document.getElementById('quizScore').textContent = currentQuiz.score;
-    
-    // Disable options
+function selectAnswer(isCorrect, buttonElement) {
     document.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
-        if (btn.textContent === correct) {
-            btn.style.background = '#4CAF50';
-            btn.style.color = 'white';
-        }
     });
-    
-    // Move to next question after delay
+    const feedback = document.getElementById('feedback');
+    feedback.classList.remove('hidden');
+    if (isCorrect) {
+        quizScore++;
+        buttonElement.classList.add('correct');
+        feedback.className = 'feedback correct';
+        feedback.textContent = '✓ Correct! Great job!';
+    } else {
+        buttonElement.classList.add('incorrect');
+        feedback.className = 'feedback incorrect';
+        feedback.textContent = '✗ Incorrect. Try to remember this one!';
+        const correctSign = currentQuiz.questions[currentQuestionIndex].correctSign;
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            if (btn.textContent === correctSign.name) {
+                btn.classList.add('correct');
+            }
+        });
+    }
     setTimeout(() => {
-        feedback.classList.add('hidden');
-        currentQuiz.currentQuestion++;
-        
-        if (currentQuiz.currentQuestion < currentQuiz.questions.length) {
-            displayQuizQuestion();
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuiz.totalQuestions) {
+            showQuizQuestion();
         } else {
             showQuizResults();
         }
-    }, 2000);
+    }, 1500);
 }
-
-function showQuizResults() {
+async function showQuizResults() {
     document.getElementById('quizView').classList.add('hidden');
     document.getElementById('quizResults').classList.remove('hidden');
-    
-    const score = currentQuiz.score;
-    const total = currentQuiz.questions.length;
-    const percentage = Math.round((score / total) * 100);
-    
-    document.getElementById('finalScore').textContent = score;
-    document.getElementById('finalTotal').textContent = total;
-    document.getElementById('percentage').textContent = `${percentage}%`;
-    
+    const percentage = Math.round((quizScore / currentQuiz.totalQuestions) * 100);
+    document.getElementById('finalScore').textContent = quizScore;
+    document.getElementById('finalTotal').textContent = currentQuiz.totalQuestions;
+    document.getElementById('percentage').textContent = percentage + '%';
     let message = '';
-    if (percentage >= 90) message = '🌟 Excellent! You\'re a signing superstar!';
-    else if (percentage >= 70) message = '👍 Great job! Keep practicing!';
-    else if (percentage >= 50) message = '👌 Good effort! You\'re improving!';
-    else message = '💪 Keep trying! Practice makes perfect!';
-    
+    if (percentage === 100) {
+        message = '🌟 Perfect score! You\'re a sign language master!';
+    } else if (percentage >= 80) {
+        message = '🎉 Excellent work! Keep it up!';
+    } else if (percentage >= 60) {
+        message = '👍 Good job! Practice a bit more to master it!';
+    } else {
+        message = '💪 Keep practicing! You\'ll get better!';
+    }
     document.getElementById('resultsMessage').textContent = message;
-    
-    // Update progress
-    const progress = getProgress();
-    progress[currentLanguage].totalScore += score;
-    progress[currentLanguage].quizzesTaken++;
-    saveProgress(progress);
-    updateHomeStats();
+    await updateQuizStats(quizScore, currentQuiz.totalQuestions);
 }
-
 function retryQuiz() {
     startQuiz();
 }
-
 function exitQuiz() {
-    currentQuiz.isActive = false;
     showPracticeHome();
 }
-
-// Rhythm game functions
-function startRhythmGame(category) {
-    currentCategory = category;
-    rhythmGameState = {
-        isActive: true,
-        score: 0,
-        combo: 0,
-        maxCombo: 0,
-        interval: null
-    };
-    
-    document.getElementById('practiceHome').classList.add('hidden');
-    document.getElementById('rhythmGame').classList.remove('hidden');
-    document.getElementById('rhythmResults').classList.add('hidden');
-    
-    const title = currentLanguage === 'asl' ? 'ASL Rhythm Game' : 'FSL Rhythm Game';
-    document.getElementById('rhythmGameTitle').textContent = `🎵 ${title}`;
-    
-    updateRhythmDisplay();
-    startRhythmGameLoop();
+function showPracticeHome() {
+    document.getElementById('quizView').classList.add('hidden');
+    document.getElementById('quizResults').classList.add('hidden');
+    document.getElementById('practiceHome').classList.remove('hidden');
 }
-
-function updateRhythmDisplay() {
-    document.getElementById('rhythmScore').textContent = rhythmGameState.score;
-    document.getElementById('rhythmCombo').textContent = rhythmGameState.combo;
-}
-
-function startRhythmGameLoop() {
-    const signs = signLanguageData[currentLanguage][currentCategory];
-    let questionCount = 0;
-    const maxQuestions = 15;
-    
-    function nextRound() {
-        if (!rhythmGameState.isActive || questionCount >= maxQuestions) {
-            stopRhythmGame();
+async function updateProgressDisplay() {
+    try {
+        const progress = getProgress();
+        const langProgress = progress[currentLanguage];
+        if (!langProgress || !langProgress.learned) {
+            console.error('Language progress not found for:', currentLanguage);
+            displayAchievements(null);
             return;
         }
-        
-        const correctSign = signs[Math.floor(Math.random() * signs.length)];
-        const wrongSigns = signs
-            .filter(s => s.name !== correctSign.name)
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3);
-        
-        const options = [correctSign, ...wrongSigns]
-            .sort(() => 0.5 - Math.random());
-        
-        document.getElementById('fallingSign').textContent = correctSign.sign;
-        
-        const optionsDiv = document.getElementById('rhythmOptions');
-        optionsDiv.innerHTML = '';
-        
-        let answered = false;
-        options.forEach(option => {
-            const button = document.createElement('button');
-            button.className = 'rhythm-option-btn';
-            button.textContent = option.name;
-            button.onclick = () => {
-                if (answered) return;
-                answered = true;
-                checkRhythmAnswer(option.name, correctSign.name, nextRound);
-            };
-            optionsDiv.appendChild(button);
-        });
-        
-        questionCount++;
-        
-        // Auto-advance after 3 seconds if no answer
-        rhythmGameState.timeout = setTimeout(() => {
-            if (!answered) {
-                answered = true;
-                rhythmGameState.combo = 0;
-                document.getElementById('rhythmFeedback').textContent = '⏰ Too slow!';
-                setTimeout(() => {
-                    document.getElementById('rhythmFeedback').textContent = '';
-                    nextRound();
-                }, 1000);
+        const validCategories = ['alphabet', 'numbers', 'greetings', 'common'];
+        const totalSigns = validCategories.reduce((sum, category) => {
+            return sum + (signCategories[category] ? signCategories[category].length : 0);
+        }, 0);
+        const learnedSigns = Object.values(langProgress.learned).reduce((sum, arr) => sum + arr.length, 0);
+        const overallPercentage = Math.round((learnedSigns / totalSigns) * 100);
+        document.getElementById('overallProgress').textContent = overallPercentage + '%';
+        const circumference = 408.4;
+        const offset = circumference - (overallPercentage / 100) * circumference;
+        document.getElementById('progressCircle').style.strokeDashoffset = offset;
+        const categoryProgressList = document.getElementById('categoryProgressList');
+        categoryProgressList.innerHTML = '';
+        const categoryNames = {
+            alphabet: 'Alphabet',
+            numbers: 'Numbers',
+            greetings: 'Greetings',
+            common: 'Common Words'
+        };
+        validCategories.forEach(category => {
+            if (!signCategories[category] || !Array.isArray(signCategories[category])) {
+                return;
             }
-        }, 3000);
-    }
-    
-    nextRound();
-}
-
-function checkRhythmAnswer(selected, correct, callback) {
-    clearTimeout(rhythmGameState.timeout);
-    
-    const feedback = document.getElementById('rhythmFeedback');
-    
-    if (selected === correct) {
-        rhythmGameState.score += 10;
-        rhythmGameState.combo++;
-        if (rhythmGameState.combo > rhythmGameState.maxCombo) {
-            rhythmGameState.maxCombo = rhythmGameState.combo;
+            const total = signCategories[category].length;
+            const learned = langProgress.learned[category] ? langProgress.learned[category].length : 0;
+            const percentage = Math.round((learned / total) * 100);
+        const progressItem = document.createElement('div');
+        progressItem.className = 'progress-item';
+        progressItem.innerHTML = `
+            <div class="progress-item-header">
+                <span class="progress-item-name">${categoryNames[category]}</span>
+                <span class="progress-item-percentage">${learned}/${total} (${percentage}%)</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${percentage}%"></div>
+            </div>
+        `;
+        categoryProgressList.appendChild(progressItem);
+    });
+    const rhythmStats = langProgress.rhythmGameStats || {
+        totalGamesPlayed: 0,
+        highScore: 0,
+        totalScore: 0
+    };
+    const avgScore = rhythmStats.totalGamesPlayed > 0 
+        ? Math.round(rhythmStats.totalScore / rhythmStats.totalGamesPlayed) 
+        : 0;
+    const rhythmStatsItem = document.createElement('div');
+    rhythmStatsItem.className = 'progress-item rhythm-game-stats';
+    rhythmStatsItem.innerHTML = `
+        <div class="progress-item-header flex items-center justify-between gap-2">
+            <span class="progress-item-name">🎵 Rhythm Game Performance</span>
+            <span class="progress-item-percentage ml-auto text-right">${rhythmStats.totalGamesPlayed} ${rhythmStats.totalGamesPlayed === 1 ? 'game' : 'games'} played</span>
+        </div>
+        <div class="rhythm-stats-grid">
+            <div class="rhythm-stat-card">
+                <div class="rhythm-stat-label">High Score</div>
+                <div class="rhythm-stat-value">${rhythmStats.highScore}</div>
+            </div>
+            <div class="rhythm-stat-card">
+                <div class="rhythm-stat-label">Average Score</div>
+                <div class="rhythm-stat-value">${avgScore}</div>
+            </div>
+            <div class="rhythm-stat-card">
+                <div class="rhythm-stat-label">Total Score</div>
+                <div class="rhythm-stat-value">${rhythmStats.totalScore}</div>
+            </div>
+        </div>
+    `;
+    categoryProgressList.appendChild(rhythmStatsItem);
+    await checkAchievements(langProgress, false);
+    displayAchievements(langProgress);
+    } catch (error) {
+        console.error('Error updating progress display:', error);
+        try {
+            const progress = getProgress();
+            const langProgress = progress[currentLanguage];
+            await checkAchievements(langProgress, false);
+            displayAchievements(langProgress);
+        } catch (e) {
+            console.error('Error displaying achievements:', e);
+            displayAchievements(null);
         }
-        rhythmGameState.score += rhythmGameState.combo; // Bonus points for combo
-        feedback.textContent = '✅ Correct! +' + (10 + rhythmGameState.combo);
-        feedback.style.color = '#4CAF50';
-    } else {
-        rhythmGameState.combo = 0;
-        feedback.textContent = '❌ Wrong!';
-        feedback.style.color = '#f44336';
     }
-    
-    updateRhythmDisplay();
-    
-    setTimeout(() => {
-        feedback.textContent = '';
-        callback();
-    }, 1000);
 }
-
+const achievements = [
+    {
+        id: 'first_sign',
+        icon: '🎯',
+        title: 'First Sign',
+        description: 'Learn your first sign',
+        condition: (progress) => Object.values(progress.learned).some(arr => arr.length > 0)
+    },
+    {
+        id: 'alphabet_master',
+        icon: '🔤',
+        title: 'Alphabet Master',
+        description: 'Complete the alphabet category',
+        condition: (progress) => progress.learned.alphabet.length === signCategories.alphabet.length
+    },
+    {
+        id: 'number_guru',
+        icon: '🔢',
+        title: 'Number Guru',
+        description: 'Complete the numbers category',
+        condition: (progress) => progress.learned.numbers.length === signCategories.numbers.length
+    },
+    {
+        id: 'social_butterfly',
+        icon: '👋',
+        title: 'Social Butterfly',
+        description: 'Complete the greetings category',
+        condition: (progress) => progress.learned.greetings.length === signCategories.greetings.length
+    },
+    {
+        id: 'word_wizard',
+        icon: '💬',
+        title: 'Word Wizard',
+        description: 'Complete the common words category',
+        condition: (progress) => progress.learned.common.length === signCategories.common.length
+    },
+    {
+        id: 'quiz_taker',
+        icon: '📝',
+        title: 'Quiz Taker',
+        description: 'Complete your first quiz',
+        condition: (progress) => progress.quizzesTaken >= 1
+    },
+    {
+        id: 'dedicated_learner',
+        icon: '⭐',
+        title: 'Dedicated Learner',
+        description: 'Complete 10 quizzes',
+        condition: (progress) => progress.quizzesTaken >= 10
+    },
+    {
+        id: 'sign_master',
+        icon: '🏆',
+        title: 'Sign Language Master',
+        description: 'Complete all categories',
+        condition: (progress) => {
+            const validCategories = ['alphabet', 'numbers', 'greetings', 'common'];
+            return validCategories.every(category => 
+                progress.learned[category] && 
+                signCategories[category] && 
+                progress.learned[category].length === signCategories[category].length
+            );
+        }
+    },
+    {
+        id: 'rhythm_player',
+        icon: '🎵',
+        title: 'Rhythm Player',
+        description: 'Play your first rhythm game',
+        condition: (progress) => progress.rhythmGameStats && progress.rhythmGameStats.totalGamesPlayed >= 1
+    },
+    {
+        id: 'rhythm_enthusiast',
+        icon: '🎮',
+        title: 'Rhythm Enthusiast',
+        description: 'Play 5 rhythm games',
+        condition: (progress) => progress.rhythmGameStats && progress.rhythmGameStats.totalGamesPlayed >= 5
+    },
+    {
+        id: 'rhythm_champion',
+        icon: '🏅',
+        title: 'Rhythm Champion',
+        description: 'Score 100+ points in a rhythm game',
+        condition: (progress) => progress.rhythmGameStats && progress.rhythmGameStats.highScore >= 100
+    }
+];
+async function checkAchievements(langProgress, showNotifications = true) {
+    if (!langProgress || !langProgress.achievements) {
+        console.warn('Cannot check achievements - progress data invalid');
+        return;
+    }
+    let newAchievementUnlocked = false;
+    const unlockedAchievements = [];
+    achievements.forEach(achievement => {
+        try {
+            if (!langProgress.achievements.includes(achievement.id)) {
+                if (achievement.condition(langProgress)) {
+                    langProgress.achievements.push(achievement.id);
+                    unlockedAchievements.push(achievement);
+                    newAchievementUnlocked = true;
+                }
+            }
+        } catch (error) {
+            console.error(`Error checking achievement ${achievement.id}:`, error);
+        }
+    });
+    if (newAchievementUnlocked) {
+        const fullProgress = getProgress();
+        fullProgress[currentLanguage].achievements = langProgress.achievements;
+        saveProgress(fullProgress);
+        if (showNotifications) {
+            unlockedAchievements.forEach(achievement => {
+                showAchievementNotification(achievement);
+            });
+        } else {
+            console.log('Retroactively unlocked achievements:', unlockedAchievements.map(a => a.title));
+        }
+        if (window.StatsDB && window.StatsDB.save) {
+            await window.StatsDB.save();
+        }
+    }
+}
+function showAchievementNotification(achievement) {
+    alert(`🎉 Achievement Unlocked!\n\n${achievement.icon} ${achievement.title}\n${achievement.description}`);
+}
+function displayAchievements(progress) {
+    const achievementsList = document.getElementById('achievementsList');
+    if (!achievementsList) {
+        console.warn('Achievements list element not found');
+        return;
+    }
+    achievementsList.innerHTML = '';
+    if (!progress || !progress.achievements) {
+        console.warn('Progress or achievements not found');
+        achievements.forEach(achievement => {
+            const achievementItem = document.createElement('div');
+            achievementItem.className = 'achievement-item locked';
+            achievementItem.innerHTML = `
+                <div class="achievement-icon">🔒</div>
+                <div class="achievement-text">
+                    <h4>${achievement.title}</h4>
+                    <p>${achievement.description}</p>
+                </div>
+            `;
+            achievementsList.appendChild(achievementItem);
+        });
+        return;
+    }
+    achievements.forEach(achievement => {
+        const isUnlocked = progress.achievements.includes(achievement.id);
+        const achievementItem = document.createElement('div');
+        achievementItem.className = `achievement-item ${isUnlocked ? '' : 'locked'}`;
+        achievementItem.innerHTML = `
+            <div class="achievement-icon">${isUnlocked ? achievement.icon : '🔒'}</div>
+            <div class="achievement-text">
+                <h4>${achievement.title}</h4>
+                <p>${achievement.description}</p>
+            </div>
+        `;
+        achievementsList.appendChild(achievementItem);
+    });
+}
+let rhythmGame = {
+    isPlaying: false,
+    score: 0,
+    combo: 0,
+    maxCombo: 0,
+    fallingSign: null,
+    gameSpeed: 3000, 
+    spawnInterval: null,
+    animationFrame: null,
+    category: 'alphabet'
+};
+function startRhythmGame(category = 'alphabet') {
+    rhythmGame.category = category;
+    rhythmGame.isPlaying = true;
+    rhythmGame.score = 0;
+    rhythmGame.combo = 0;
+    rhythmGame.maxCombo = 0;
+    document.getElementById('practiceHome').classList.add('hidden');
+    document.getElementById('rhythmGame').classList.remove('hidden');
+    updateRhythmGameUI();
+    spawnFallingSign();
+    rhythmGame.spawnInterval = setInterval(spawnFallingSign, rhythmGame.gameSpeed);
+}
+function spawnFallingSign() {
+    if (!rhythmGame.isPlaying) return;
+    const signs = signCategories[rhythmGame.category];
+    const correctSign = signs[Math.floor(Math.random() * signs.length)];
+    const wrongOptions = signs
+        .filter(s => s.id !== correctSign.id)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2);
+    const allOptions = [correctSign, ...wrongOptions].sort(() => Math.random() - 0.5);
+    rhythmGame.fallingSign = {
+        sign: correctSign,
+        options: allOptions,
+        position: 0,
+        startTime: Date.now()
+    };
+    displayFallingSign();
+    animateFallingSign();
+}
+function displayFallingSign() {
+    const signElement = document.getElementById('fallingSign');
+    const optionsContainer = document.getElementById('rhythmOptions');
+    signElement.textContent = rhythmGame.fallingSign.sign.visual;
+    signElement.style.top = '0%';
+    optionsContainer.innerHTML = '';
+    rhythmGame.fallingSign.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'rhythm-option-btn';
+        button.textContent = option.name;
+        button.onclick = () => checkRhythmAnswer(option.id === rhythmGame.fallingSign.sign.id);
+        optionsContainer.appendChild(button);
+    });
+}
+function animateFallingSign() {
+    if (!rhythmGame.isPlaying || !rhythmGame.fallingSign) return;
+    const elapsed = Date.now() - rhythmGame.fallingSign.startTime;
+    const progress = Math.min(elapsed / rhythmGame.gameSpeed, 1);
+    rhythmGame.fallingSign.position = progress * 100;
+    const signElement = document.getElementById('fallingSign');
+    signElement.style.top = rhythmGame.fallingSign.position + '%';
+    if (progress >= 1) {
+        missedSign();
+        return;
+    }
+    rhythmGame.animationFrame = requestAnimationFrame(animateFallingSign);
+}
+function checkRhythmAnswer(isCorrect) {
+    if (!rhythmGame.fallingSign) return;
+    cancelAnimationFrame(rhythmGame.animationFrame);
+    const signElement = document.getElementById('fallingSign');
+    const feedbackElement = document.getElementById('rhythmFeedback');
+    if (isCorrect) {
+        rhythmGame.score += 10;
+        rhythmGame.combo++;
+        rhythmGame.maxCombo = Math.max(rhythmGame.maxCombo, rhythmGame.combo);
+        signElement.classList.add('rhythm-correct');
+        feedbackElement.textContent = '✓ Perfect!';
+        feedbackElement.className = 'rhythm-feedback show correct';
+        rhythmGame.gameSpeed = Math.max(2000, rhythmGame.gameSpeed - 50);
+    } else {
+        rhythmGame.combo = 0;
+        signElement.classList.add('rhythm-wrong');
+        feedbackElement.textContent = '✗ Wrong!';
+        feedbackElement.className = 'rhythm-feedback show wrong';
+    }
+    updateRhythmGameUI();
+    setTimeout(() => {
+        signElement.classList.remove('rhythm-correct', 'rhythm-wrong');
+        feedbackElement.classList.remove('show');
+        rhythmGame.fallingSign = null;
+    }, 300);
+}
+function missedSign() {
+    if (!rhythmGame.fallingSign) return;
+    rhythmGame.combo = 0;
+    const feedbackElement = document.getElementById('rhythmFeedback');
+    feedbackElement.textContent = 'Missed!';
+    feedbackElement.className = 'rhythm-feedback show wrong';
+    updateRhythmGameUI();
+    setTimeout(() => {
+        feedbackElement.classList.remove('show');
+        rhythmGame.fallingSign = null;
+    }, 300);
+}
+function updateRhythmGameUI() {
+    document.getElementById('rhythmScore').textContent = rhythmGame.score;
+    document.getElementById('rhythmCombo').textContent = rhythmGame.combo;
+}
 function stopRhythmGame() {
-    rhythmGameState.isActive = false;
-    clearTimeout(rhythmGameState.timeout);
-    
+    rhythmGame.isPlaying = false;
+    clearInterval(rhythmGame.spawnInterval);
+    cancelAnimationFrame(rhythmGame.animationFrame);
+    showRhythmGameResults();
+}
+async function showRhythmGameResults() {
     document.getElementById('rhythmGame').classList.add('hidden');
     document.getElementById('rhythmResults').classList.remove('hidden');
-    
-    document.getElementById('rhythmFinalScore').textContent = rhythmGameState.score;
-    document.getElementById('rhythmMaxCombo').textContent = rhythmGameState.maxCombo;
-    
+    document.getElementById('rhythmFinalScore').textContent = rhythmGame.score;
+    document.getElementById('rhythmMaxCombo').textContent = rhythmGame.maxCombo;
     let message = '';
-    if (rhythmGameState.score >= 200) message = '🌟 Amazing! Perfect rhythm!';
-    else if (rhythmGameState.score >= 150) message = '🎵 Great timing!';
-    else if (rhythmGameState.score >= 100) message = '👍 Good job!';
-    else message = '💪 Keep practicing!';
-    
+    if (rhythmGame.score >= 100) {
+        message = '🌟 Amazing! You have great rhythm!';
+    } else if (rhythmGame.score >= 50) {
+        message = '🎉 Good job! Keep practicing!';
+    } else {
+        message = '💪 Nice try! Practice makes perfect!';
+    }
     document.getElementById('rhythmResultMessage').textContent = message;
-    
-    // Update progress
+    await saveRhythmGameStats(rhythmGame.score, rhythmGame.maxCombo);
+}
+async function saveRhythmGameStats(score, maxCombo) {
     const progress = getProgress();
-    progress[currentLanguage].totalScore += Math.floor(rhythmGameState.score / 10);
+    const langProgress = progress[currentLanguage];
+    if (!langProgress.rhythmGameStats) {
+        langProgress.rhythmGameStats = {
+            totalGamesPlayed: 0,
+            highScore: 0,
+            totalScore: 0
+        };
+    }
+    langProgress.rhythmGameStats.totalGamesPlayed += 1;
+    langProgress.rhythmGameStats.highScore = Math.max(langProgress.rhythmGameStats.highScore || 0, score);
+    langProgress.rhythmGameStats.totalScore += score;
+    await checkAchievements(langProgress);
     saveProgress(progress);
-    updateHomeStats();
+    if (window.StatsDB && window.StatsDB.save) {
+        await window.StatsDB.save();
+    }
+    console.log('Rhythm game stats saved:', langProgress.rhythmGameStats);
 }
-
 function retryRhythmGame() {
-    startRhythmGame(currentCategory);
+    document.getElementById('rhythmResults').classList.add('hidden');
+    startRhythmGame(rhythmGame.category);
 }
-
 function exitRhythmGame() {
-    rhythmGameState.isActive = false;
-    clearTimeout(rhythmGameState.timeout);
-    showPracticeHome();
-}
-
-function showPracticeHome() {
+    rhythmGame.isPlaying = false;
+    clearInterval(rhythmGame.spawnInterval);
+    cancelAnimationFrame(rhythmGame.animationFrame);
+    document.getElementById('rhythmGame').classList.add('hidden');
+    document.getElementById('rhythmResults').classList.add('hidden');
     document.getElementById('practiceHome').classList.remove('hidden');
+}
+function showPracticeHome() {
+    if (rhythmGame.isPlaying) {
+        rhythmGame.isPlaying = false;
+        clearInterval(rhythmGame.spawnInterval);
+        cancelAnimationFrame(rhythmGame.animationFrame);
+    }
     document.getElementById('quizView').classList.add('hidden');
     document.getElementById('quizResults').classList.add('hidden');
     document.getElementById('rhythmGame').classList.add('hidden');
     document.getElementById('rhythmResults').classList.add('hidden');
+    document.getElementById('practiceHome').classList.remove('hidden');
 }
-
-// Progress functions
-function resetProgress() {
-    if (confirm('Are you sure you want to reset ALL your progress? This cannot be undone!')) {
-        const emptyProgress = {
-            asl: {
-                learned: { alphabet: [], numbers: [], greetings: [], common: [] },
-                totalScore: 0,
-                quizzesTaken: 0,
-                achievements: []
-            },
-            fsl: {
-                learned: { alphabet: [], numbers: [], greetings: [], common: [] },
-                totalScore: 0,
-                quizzesTaken: 0,
-                achievements: []
-            }
-        };
-        saveProgress(emptyProgress);
-        updateHomeStats();
-        updateCategoryProgress();
-        alert('Progress has been reset!');
+function saveProgress(progress) {
+    if (progress) {
+        localStorage.setItem('signLanguageProgress', JSON.stringify(progress));
     }
+    saveUserProgress();
 }

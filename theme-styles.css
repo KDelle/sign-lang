@@ -1,0 +1,517 @@
+/* ===================================
+   GESTURIX - THEME-AWARE STYLES
+   Supports both Light and Dark modes
+   =================================== */
+
+/* CSS Variables - Will be set by theme-manager.js */
+:root {
+    --color-main-bg: #000035;
+    --color-container-bg: #0b0b7e;
+    --color-secondary-bg: #0505a3;
+    --color-accent: #ffff02;
+    --color-accent-hover: #e6e602;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #e0e0e0;
+    --color-border: #0505a3;
+    --color-border-hover: #ffff02;
+}
+
+/* Theme Toggle Button Styles */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-container-bg);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--color-accent);
+    color: var(--color-main-bg);
+    border-color: var(--color-accent);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.98);
+}
+
+.theme-label {
+    font-weight: 500;
+}
+
+/* Global Background */
+body,
+html,
+#mainApp {
+    background: var(--color-main-bg) !important;
+    color: var(--color-text-primary) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header Styling */
+header {
+    background: var(--color-container-bg) !important;
+    border-color: var(--color-border) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* Cards and Containers */
+.bg-\[\#0a0a0a\],
+.bg-\[\#171717\],
+.bg-\[\#0b0b7e\] {
+    background: var(--color-container-bg) !important;
+}
+
+/* Secondary Containers */
+.bg-\[\#262626\],
+.bg-\[\#0505a3\] {
+    background: var(--color-secondary-bg) !important;
+}
+
+/* Borders */
+.border-\[\#262626\],
+.border-\[\#0505a3\] {
+    border-color: var(--color-border) !important;
+}
+
+/* Text Colors */
+.text-\[\#e5e5e5\],
+.text-\[\#a3a3a3\],
+.text-\[\#737373\],
+.text-white {
+    color: var(--color-text-primary) !important;
+}
+
+.text-\[\#ffffff\] {
+    color: var(--color-text-primary) !important;
+    opacity: 0.9;
+}
+
+/* Accent Colors */
+.text-\[\#0ea5e9\],
+.text-\[\#f97316\],
+.text-primary-500,
+.text-accent-500,
+.text-\[\#ffff02\] {
+    color: var(--color-accent) !important;
+}
+
+.bg-\[\#0ea5e9\],
+.bg-\[\#f97316\],
+.bg-primary-500,
+.bg-\[\#ffff02\] {
+    background: var(--color-accent) !important;
+    color: var(--color-main-bg) !important;
+}
+
+/* Primary Buttons */
+button.bg-white,
+.btn-primary,
+button[type="submit"]:not(.btn-secondary),
+.bg-\[\#ffff02\] {
+    background: var(--color-accent) !important;
+    color: var(--color-main-bg) !important;
+    font-weight: 600;
+}
+
+button.bg-white:hover,
+.btn-primary:hover,
+.bg-\[\#ffff02\]:hover {
+    background: var(--color-accent-hover) !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 2, 0.3);
+}
+
+/* Secondary Buttons */
+.btn-secondary,
+button.bg-\[\#262626\] {
+    background: var(--color-secondary-bg) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.btn-secondary:hover,
+button.bg-\[\#262626\]:hover {
+    background: var(--color-border-hover) !important;
+    opacity: 0.9;
+}
+
+/* Navigation Buttons */
+.nav-btn {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.nav-btn:hover {
+    background: var(--color-secondary-bg);
+    border-color: var(--color-accent);
+}
+
+.nav-btn.active {
+    background: var(--color-accent) !important;
+    color: var(--color-main-bg) !important;
+    font-weight: 600;
+}
+
+/* Category Cards */
+.category-card {
+    background: var(--color-container-bg) !important;
+    border: 2px solid var(--color-border) !important;
+    transition: all 0.2s ease;
+}
+
+.category-card:hover {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 4px 20px rgba(255, 255, 2, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Progress Bars */
+.progress-bar {
+    background: var(--color-secondary-bg);
+    overflow: hidden;
+    border-radius: 9999px;
+}
+
+.progress-fill {
+    background: var(--color-accent);
+    transition: width 0.3s ease;
+}
+
+/* Input Fields */
+input,
+select,
+textarea {
+    background: var(--color-main-bg) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+    color: var(--color-text-primary) !important;
+    opacity: 0.5;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: var(--color-border-hover) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--color-border-hover) !important;
+    box-shadow: 0 0 0 1px var(--color-border-hover) !important;
+}
+
+/* Quiz Options */
+.option-btn {
+    background: var(--color-container-bg);
+    border: 2px solid var(--color-border);
+    color: var(--color-text-primary);
+    transition: all 0.15s ease;
+}
+
+.option-btn:hover {
+    border-color: var(--color-accent);
+    background: var(--color-secondary-bg);
+}
+
+.option-btn.correct {
+    background: #10b981 !important;
+    color: white !important;
+    border-color: #10b981 !important;
+}
+
+.option-btn.incorrect {
+    background: #ef4444 !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+}
+
+.option-btn:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* Rhythm Game */
+.rhythm-option-btn {
+    background: var(--color-container-bg);
+    border: 2px solid var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.rhythm-option-btn:hover {
+    background: var(--color-accent);
+    color: var(--color-main-bg);
+    border-color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* Stats Cards */
+.stat-card {
+    background: var(--color-container-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+/* Achievements */
+.achievement-item {
+    background: var(--color-container-bg);
+    border: 1px solid var(--color-border);
+}
+
+.achievement-item.unlocked {
+    border-color: var(--color-accent);
+}
+
+/* Modal/Dialog */
+.modal,
+.dialog {
+    background: var(--color-container-bg);
+    border: 2px solid var(--color-border);
+}
+
+/* Logout Button */
+.logout-btn {
+    background: var(--color-accent) !important;
+    color: var(--color-main-bg) !important;
+    font-weight: 600;
+}
+
+.logout-btn:hover {
+    background: var(--color-accent-hover) !important;
+}
+
+/* Language Selector */
+#languageSelect {
+    background: var(--color-container-bg) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+}
+
+#languageSelect:focus {
+    border-color: var(--color-accent) !important;
+}
+
+/* Links */
+a {
+    color: var(--color-accent);
+    transition: color 0.15s ease;
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+}
+
+/* Icons with Accent Color */
+.lucide[class*="text-primary"],
+.lucide[class*="text-accent"],
+i.bi[class*="text-primary"],
+i.bi[class*="text-accent"] {
+    color: var(--color-accent) !important;
+}
+
+/* Feedback Messages */
+.feedback.correct {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #10b981 !important;
+    border: 1px solid #10b981 !important;
+}
+
+.feedback.incorrect {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    border: 1px solid #ef4444 !important;
+}
+
+/* Loading States */
+.loading {
+    color: var(--color-accent);
+}
+
+/* Scrollbar (for webkit browsers) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-hover);
+}
+
+/* Selection Color */
+::selection {
+    background: var(--color-accent);
+    color: var(--color-main-bg);
+}
+
+::-moz-selection {
+    background: var(--color-accent);
+    color: var(--color-main-bg);
+}
+
+/* Focus Visible (Accessibility) */
+*:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Disabled States */
+button:disabled,
+input:disabled,
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Shadows */
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* User Info Display */
+.user-info-display {
+    background: var(--color-container-bg);
+    border: 1px solid var(--color-border);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* Progress Section Overrides */
+.progress-card-main,
+.category-progress,
+.achievements,
+.rhythm-stats-grid {
+    background: var(--color-container-bg) !important;
+    border-color: var(--color-border) !important;
+}
+
+/* Circular Progress */
+.circular-progress circle {
+    stroke: var(--color-accent) !important;
+}
+
+/* Home Stats Numbers */
+#totalLearned,
+#totalScore,
+#quizzesTaken {
+    color: var(--color-accent) !important;
+    font-weight: 700;
+}
+
+/* Lesson Flashcard */
+.flashcard {
+    background: var(--color-container-bg);
+    border: 2px solid var(--color-border);
+}
+
+.flashcard:hover {
+    border-color: var(--color-accent);
+}
+
+/* Quiz Results */
+.quiz-results {
+    background: var(--color-container-bg);
+    border: 2px solid var(--color-border);
+    padding: 30px;
+    border-radius: 16px;
+}
+
+/* Badge/Tag Styles */
+.badge {
+    background: var(--color-accent);
+    color: var(--color-main-bg);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Hover Effects for Interactive Elements */
+.interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation for Glow */
+@keyframes accentGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px var(--color-accent);
+        opacity: 0.5;
+    }
+    50% {
+        box-shadow: 0 0 20px var(--color-accent);
+        opacity: 0.8;
+    }
+}
+
+.glow-accent {
+    animation: accentGlow 2s infinite;
+}
+
+/* Theme-specific adjustments */
+[data-theme="light"] {
+    /* Light mode specific overrides */
+}
+
+[data-theme="light"] .shadow,
+[data-theme="light"] .shadow-sm,
+[data-theme="light"] .shadow-md,
+[data-theme="light"] .shadow-lg {
+    box-shadow: 0 4px 20px rgba(15, 15, 108, 0.15);
+}
+
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+    background: #ffffff !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .category-card {
+        padding: 16px;
+    }
+    
+    .stat-card {
+        padding: 16px;
+    }
+    
+    .theme-toggle-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}

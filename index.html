@@ -3,431 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gesturix</title>
-    <title>Sign Language Learning Game</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Gesturix - Sign Language Learning</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lucide-static/font/lucide.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Theme Styles -->
+    <link rel="stylesheet" href="theme-styles.css">
+    <link rel="stylesheet" href="animations.css">
+    
+    <!-- Theme Manager - Load early to prevent flash -->
+    <script src="theme-manager.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#e6e6fa',
+                            100: '#cfcff5',
+                            200: '#9f9feb',
+                            300: '#6f6fe1',
+                            400: '#3f3fd7',
+                            500: '#0f0f6c',
+                            600: '#0b0b7e',
+                            700: '#0909a0',
+                            800: '#0505a3',
+                            900: '#040480',
+                        },
+                        accent: {
+                            500: '#ffff02',
+                            600: '#e6e602',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
+<body class="font-sans leading-relaxed antialiased overflow-x-hidden m-0 p-0">
+    <!-- Theme Toggle Button (Fixed Position) -->
+    <div class="fixed top-4 right-4 md:top-6 md:right-6 z-50">
+        <button 
+            id="themeToggle" 
+            onclick="toggleTheme()" 
+            class="theme-toggle-btn shadow-lg"
+            aria-label="Toggle theme"
+            title="Toggle theme"
+        >
+            <i data-lucide="sun" class="w-4 h-4"></i>
+            <span class="theme-label hidden sm:inline">Light mode</span>
+        </button>
+    </div>
 
-
-<div class="language-selector">
-    <label for="languageSelect">Choose Language:</label>
-    <select id="languageSelect" onchange="switchLanguage(this.value)">
-        <option value="asl">🇺🇸 American Sign Language (ASL)</option>
-        <option value="fsl">🇵🇭 Filipino Sign Language (FSL)</option>
-    </select>
-</div>
-
-<body>
-    
-    <div id="launchSlide" class="launch-slide">
-        <div class="launch-content">
-            <div class="launch-animation">
-                <div class="hand-icon">🤟</div>
+    <section class="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden px-6 md:px-8 py-8">
+        <div class="relative text-center max-w-[800px] mx-auto animate-hero-fade">
+            
+            <!-- Logo (with theme-aware class) -->
+            <div class="mb-8 flex justify-center">
+                <img 
+                    src="darkmodelogo.png"
+                    alt="Gesturix Logo" 
+                    class="theme-logo w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-lg"
+                >
             </div>
-            <h1 class="launch-title">Sign Language Learner</h1>
-            <p class="launch-subtitle">Learn Sign Language at your own pace</p>
-            <button class="launch-button" onclick="showLoginPage()">
-                Click to Enter ✨
+            
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-container-bg)] border border-[var(--color-border)] rounded-full text-[0.8125rem] font-medium mb-8" style="color: var(--color-text-primary);">
+                <i data-lucide="hand" class="lucide lucide-hand w-4 h-4" style="color: var(--color-accent);"></i>
+                <span>Learn sign language</span>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-5 tracking-tighter leading-tight" style="color: var(--color-text-primary);">Gesturix</h1>
+            
+            <!-- Description -->
+            <p class="text-base md:text-lg leading-relaxed opacity-90 mb-12 max-w-[600px] mx-auto font-normal" style="color: var(--color-text-primary);">
+                Master American Sign Language (ASL) and Filipino Sign Language (FSL) through interactive lessons and engaging practice.
+            </p>
+            
+            <!-- CTA Button -->
+            <button class="px-8 py-3.5 border-none rounded-lg text-[0.9375rem] font-bold cursor-pointer transition-all duration-150 inline-flex items-center gap-2 hover:shadow-lg active:scale-[0.98]" onclick="getStarted()" style="background: var(--color-accent); color: var(--color-main-bg);">
+                Get started
+                <i data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4 ml-0.5"></i>
             </button>
+            
+            <!-- Features -->
+            <div class="flex items-center justify-between gap-2 md:gap-8 mt-12 pt-12 border-t flex-nowrap w-full" style="border-color: var(--color-border);">
+                <div class="flex items-center gap-1.5 opacity-80 text-xs md:text-sm" style="color: var(--color-text-primary);">
+                    <i data-lucide="book-open" class="lucide lucide-book-open w-4 h-4 md:w-5 md:h-5" style="color: var(--color-accent);"></i>
+                    <span>Interactive lessons</span>
+                </div>
+                <div class="flex items-center gap-1.5 opacity-80 text-xs md:text-sm" style="color: var(--color-text-primary);">
+                    <i data-lucide="gamepad-2" class="lucide lucide-gamepad-2 w-4 h-4 md:w-5 md:h-5" style="color: var(--color-accent);"></i>
+                    <span>Fun games</span>
+                </div>
+                <div class="flex items-center gap-1.5 opacity-80 text-xs md:text-sm" style="color: var(--color-text-primary);">
+                    <i data-lucide="trophy" class="lucide lucide-trophy w-4 h-4 md:w-5 md:h-5" style="color: var(--color-accent);"></i>
+                    <span>Track progress</span>
+                </div>
+            </div>
         </div>
-    </div>
-
+    </section>
     
-    <div id="loginPage" class="login-page hidden">
-        <div class="login-container">
-            <div class="login-header">
-                <div class="login-icon">🤟</div>
-                <h2>Welcome to Gesturix</h2>
-                <p id="loginSubtext">Please enter your information to get started</p>
-            </div>
-            
-            
-            <div class="login-toggle">
-                <button class="toggle-btn active" id="newUserBtn" onclick="showNewUserForm()">New User</button>
-                <button class="toggle-btn" id="returningUserBtn" onclick="showReturningUserForm()">Returning User</button>
-            </div>
-
-            
-            <form id="newUserForm" class="login-form" onsubmit="handleNewUserSignup(event)">
-                <div class="form-group">
-                    <label for="newUserName">Full Name</label>
-                    <input 
-                        type="text" 
-                        id="newUserName" 
-                        name="userName" 
-                        placeholder="Enter your name" 
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="newUserCourse">Course</label>
-                    <input 
-                        type="text" 
-                        id="newUserCourse" 
-                        name="userCourse" 
-                        placeholder="e.g., Computer Science" 
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="newUserYear">Year Level</label>
-                    <select id="newUserYear" name="userYear" required>
-                        <option value="">Select your year</option>
-                        <option value="1st Year">1st Year</option>
-                        <option value="2nd Year">2nd Year</option>
-                        <option value="3rd Year">3rd Year</option>
-                        <option value="4th Year">4th Year</option>
-                        <option value="Graduate">Graduate</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="newUserPassword">Create Password</label>
-                    <input 
-                        type="password" 
-                        id="newUserPassword" 
-                        name="password" 
-                        placeholder="Create a password" 
-                        minlength="4"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input 
-                        type="password" 
-                        id="confirmPassword" 
-                        name="confirmPassword" 
-                        placeholder="Confirm your password" 
-                        minlength="4"
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="login-submit-btn">
-                    Create Account 🚀
-                </button>
-            </form>
-
-            
-            <form id="returningUserForm" class="login-form hidden" onsubmit="handleReturningUserLogin(event)">
-                <div class="form-group">
-                    <label for="returningUserName">Name</label>
-                    <input 
-                        type="text" 
-                        id="returningUserName" 
-                        name="userName" 
-                        placeholder="Enter your name" 
-                        required
-                        list="userNamesList"
-                    >
-                    <datalist id="userNamesList">
-                        
-                    </datalist>
-                </div>
-
-                <div class="form-group">
-                    <label for="returningUserPassword">Password</label>
-                    <input 
-                        type="password" 
-                        id="returningUserPassword" 
-                        name="password" 
-                        placeholder="Enter your password" 
-                        required
-                    >
-                </div>
-
-                <div class="login-error" id="loginError"></div>
-
-                <button type="submit" class="login-submit-btn">
-                    Login 🔓
-                </button>
-            </form>
-        </div>
-    </div>
-
-    
-    <div class="container" id="mainApp">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Check if user is already logged in
+        function checkUserSession() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                // User is already logged in, redirect to home
+                window.location.href = 'home.html';
+                return true;
+            }
+            return false;
+        }
         
+        // Get Started button - redirect to login/signup page
+        function getStarted() {
+            window.location.href = 'login.html';
+        }
         
-        <header>
-            <h1>🤟 Gesturix</h1>
-            <p class="subtitle">Learn basic sign language at your own pace</p>
-            <div id="userInfo" class="user-info-display"></div>
-        </header>
-
-        
-        <nav class="main-nav" id="mainNav">
-            <button class="nav-btn active" data-section="home">🏠 Home</button>
-            <button class="nav-btn" data-section="lessons">📚 Lessons</button>
-            <button class="nav-btn" data-section="practice">🎮 Practice</button>
-            <button class="nav-btn" data-section="progress">📊 Progress</button>
-        </nav>
-
-        
-        <section id="home" class="section active">
-            <div class="welcome-card">
-                <h2>Welcome to Gesturix: Sign Language Learning!</h2>
-                <p id="welcomeText">Learn the basics of American Sign Language (ASL) through interactive lessons and fun games.</p>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalLearned">0</div>
-                        <div class="stat-label">Signs Learned</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalScore">0</div>
-                        <div class="stat-label">Total Score</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="quizzesTaken">0</div>
-                        <div class="stat-label">Quizzes Completed</div>
-                    </div>
-                </div>
-
-                <button class="btn-primary large" onclick="navigateToSection('lessons')">
-                    Start Learning 🚀
-                </button>
-            </div>
-        </section>
-
-        
-        <section id="lessons" class="section">
-            <h2>Choose a Lesson Category</h2>
-            
-            <div class="lesson-categories">
-                <div class="category-card" onclick="showLesson('alphabet')">
-                    <div class="category-icon">🔤</div>
-                    <h3>Alphabet</h3>
-                    <p>Learn A-Z in ASL</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-alphabet" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <div class="category-card" onclick="showLesson('numbers')">
-                    <div class="category-icon">🔢</div>
-                    <h3>Numbers</h3>
-                    <p>Learn 0-10 in ASL</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-numbers" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <div class="category-card" onclick="showLesson('greetings')">
-                    <div class="category-icon">👋</div>
-                    <h3>Greetings</h3>
-                    <p>Common greetings</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-greetings" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <div class="category-card" onclick="showLesson('common')">
-                    <div class="category-icon">💬</div>
-                    <h3>Common Words</h3>
-                    <p>Everyday words</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-common" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            
-            <div id="lessonDetail" class="lesson-detail hidden">
-                <button class="btn-back" onclick="hideLesson()">← Back to Categories</button>
-                <h2 id="lessonTitle"></h2>
-                
-                <div class="flashcard-container">
-                    <div class="flashcard" id="flashcard">
-                        <div class="flashcard-content">
-                            <div class="sign-visual" id="signVisual"></div>
-                            <h3 id="signName"></h3>
-                            <p class="sign-description" id="signDescription"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flashcard-controls">
-                    <button class="btn-secondary" id="prevBtn" onclick="previousSign()">← Previous</button>
-                    <span class="card-counter" id="cardCounter">1 / 1</span>
-                    <button class="btn-secondary" id="nextBtn" onclick="nextSign()">Next →</button>
-                </div>
-
-                <button class="btn-primary" onclick="startQuiz()">Take Quiz 🎯</button>
-            </div>
-        </section>
-
-        
-        <section id="practice" class="section">
-            
-            <div id="quizView" class="quiz-view">
-                <div class="quiz-header">
-                    <h2>Quiz: <span id="quizCategory"></span></h2>
-                    <div class="quiz-stats">
-                        <span>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></span>
-                        <span class="score">Score: <span id="quizScore">0</span></span>
-                    </div>
-                </div>
-
-                <div class="quiz-content">
-                    <div class="question-card">
-                        <div class="sign-display" id="quizSignDisplay"></div>
-                        <p class="question-text" id="questionText">What sign is this?</p>
-                    </div>
-
-                    <div class="options-grid" id="optionsGrid">
-                        
-                    </div>
-                </div>
-
-                <div class="feedback hidden" id="feedback"></div>
-
-                <button class="btn-back" onclick="exitQuiz()">Exit Quiz</button>
-            </div>
-
-            
-            <div id="quizResults" class="quiz-results hidden">
-                <h2>🎉 Quiz Complete!</h2>
-                <div class="results-card">
-                    <div class="results-score">
-                        <div class="big-score" id="finalScore">0</div>
-                        <p>out of <span id="finalTotal">10</span></p>
-                    </div>
-                    <div class="results-percentage" id="percentage"></div>
-                    <p class="results-message" id="resultsMessage"></p>
-                </div>
-                <div class="results-actions">
-                    <button class="btn-primary" onclick="retryQuiz()">Try Again</button>
-                    <button class="btn-secondary" onclick="navigateToSection('lessons')">Back to Lessons</button>
-                </div>
-            </div>
-
-            
-            <div id="rhythmGame" class="rhythm-game hidden">
-                <div class="rhythm-game-header">
-                    <h2 id="rhythmGameTitle">🎵 ASL Rhythm Game</h2>
-                    <div class="rhythm-stats">
-                        <span class="rhythm-stat">Score: <strong id="rhythmScore">0</strong></span>
-                        <span class="rhythm-stat">Combo: <strong id="rhythmCombo">0</strong></span>
-                    </div>
-                </div>
-
-                <div class="rhythm-game-container">
-                    <div class="rhythm-track">
-                        <div class="falling-sign" id="fallingSign">👋</div>
-                        <div class="target-zone"></div>
-                    </div>
-                </div>
-
-                <div class="rhythm-feedback" id="rhythmFeedback"></div>
-
-                <div class="rhythm-options" id="rhythmOptions">
-                    
-                </div>
-
-                <div class="rhythm-controls">
-                    <button class="btn-danger" onclick="stopRhythmGame()">Stop Game</button>
-                </div>
-            </div>
-
-            
-            <div id="rhythmResults" class="rhythm-results hidden">
-                <h2>🎉 Game Over!</h2>
-                <div class="results-card">
-                    <div class="results-score">
-                        <div class="big-score" id="rhythmFinalScore">0</div>
-                        <p>Total Score</p>
-                    </div>
-                    <div class="results-stat">
-                        <span class="stat-label">Max Combo:</span>
-                        <span class="stat-value" id="rhythmMaxCombo">0</span>
-                    </div>
-                    <p class="results-message" id="rhythmResultMessage"></p>
-                </div>
-                <div class="results-actions">
-                    <button class="btn-primary" onclick="retryRhythmGame()">Play Again</button>
-                    <button class="btn-secondary" onclick="exitRhythmGame()">Back to Practice</button>
-                </div>
-            </div>
-
-            
-            <div id="practiceHome" class="practice-home">
-                <h2>Practice Your Skills</h2>
-                <p>Choose how you want to practice today!</p>
-                
-                <div class="practice-mode-grid">
-                    <div class="practice-mode-card" onclick="navigateToSection('lessons')">
-                        <div class="practice-mode-icon">📝</div>
-                        <h3>Quiz Mode</h3>
-                        <p>Test your knowledge with quizzes</p>
-                        <button class="btn-secondary">Start Quiz</button>
-                    </div>
-
-                    <div class="practice-mode-card" onclick="startRhythmGame('alphabet')">
-                        <div class="practice-mode-icon">🎮</div>
-                        <h3>Rhythm Game</h3>
-                        <p>Tap the signs as they fall!</p>
-                        <button class="btn-primary">Play Game</button>
-                    </div>
-                </div>
-
-                <div class="category-selector">
-                    <h3>Select Category for Rhythm Game:</h3>
-                    <div class="category-buttons">
-                        <button class="category-select-btn" onclick="startRhythmGame('alphabet')">🔤 Alphabet</button>
-                        <button class="category-select-btn" onclick="startRhythmGame('numbers')">🔢 Numbers</button>
-                        <button class="category-select-btn" onclick="startRhythmGame('greetings')">👋 Greetings</button>
-                        <button class="category-select-btn" onclick="startRhythmGame('common')">💬 Common Words</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        
-        <section id="progress" class="section">
-            <h2>Your Learning Progress</h2>
-            
-            <div class="progress-overview">
-                <div class="progress-card">
-                    <h3>Overall Progress</h3>
-                    <div class="circular-progress">
-                        <svg width="150" height="150">
-                            <circle cx="75" cy="75" r="65" stroke="#e0e0e0" stroke-width="10" fill="none"></circle>
-                            <circle id="progressCircle" cx="75" cy="75" r="65" stroke="#4CAF50" stroke-width="10" fill="none" 
-                                    stroke-dasharray="408.4" stroke-dashoffset="408.4" 
-                                    transform="rotate(-90 75 75)"></circle>
-                        </svg>
-                        <div class="progress-text" id="overallProgress">0%</div>
-                    </div>
-                </div>
-
-                <div class="achievements">
-                    <h3>🏆 Achievements</h3>
-                    <div id="achievementsList">
-                       
-                    </div>
-                </div>
-            </div>
-
-            <div class="category-progress">
-                <h3>Progress by Category</h3>
-                <div id="categoryProgressList">
-                    
-                </div>
-            </div>
-
-            <button class="btn-danger" onclick="resetProgress()">Reset All Progress</button>
-        </section>
-
-    </div>
-
-    
-
-    <script src="script.js"></script>
+        // Check session on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            checkUserSession();
+            // Initialize Lucide icons
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>
-

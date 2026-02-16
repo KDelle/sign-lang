@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Gesturix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lucide-static/font/lucide.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="animations.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans bg-[#0a0a0a] text-[#e5e5e5] leading-relaxed antialiased overflow-x-hidden m-0 p-0">
+    <div class="min-h-[100svh] w-full bg-[#0a0a0a] flex items-center justify-center z-[9998] transition-all duration-300 p-4 sm:p-6">
+        <div class="relative bg-[#171717] rounded-xl px-6 py-5 md:px-10 md:py-8 max-w-[420px] w-full shadow-sm border border-[#262626] animate-slide-up mx-auto">
+            <button onclick="window.location.href='index.html'" class="absolute top-3 left-3 md:top-4 md:left-4 p-1.5 md:p-2 text-[#737373] hover:text-[#e5e5e5] transition-colors duration-150 rounded-lg hover:bg-[#262626]">
+                <i data-lucide="arrow-left" class="lucide lucide-arrow-left w-4 h-4 md:w-5 md:h-5"></i>
+            </button>
+            <div class="text-center mb-3 md:mb-5">
+                <div class="w-12 h-12 md:w-14 md:h-14 mx-auto mb-2 md:mb-3 bg-white rounded-[0.625rem] flex items-center justify-center">
+                    <i data-lucide="hand" class="lucide lucide-hand w-6 h-6 md:w-7 md:h-7 text-[#0a0a0a]"></i>
+                </div>
+                <h2 class="text-white text-xl md:text-2xl font-semibold mb-0.5 md:mb-1 tracking-tight">Create account</h2>
+                <p class="text-[#a3a3a3] text-xs md:text-sm font-normal">Start learning sign language today</p>
+            </div>
+            <div class="flex items-center justify-center gap-2 mb-3 md:mb-5">
+                <div id="signup-step1-indicator" class="h-1.5 w-10 md:w-12 rounded-full bg-white transition-all duration-300"></div>
+                <div id="signup-step2-indicator" class="h-1.5 w-10 md:w-12 rounded-full bg-[#262626] transition-all duration-300"></div>
+                <div id="signup-step3-indicator" class="h-1.5 w-10 md:w-12 rounded-full bg-[#262626] transition-all duration-300"></div>
+            </div>
+            <form id="newUserForm" onsubmit="handleNewUserSignup(event)">
+                <div id="signup-step-1" class="flex flex-col gap-2.5 md:gap-3">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="newUserName" class="text-[#e5e5e5] font-medium text-sm">Full name</label>
+                        <input 
+                            type="text" 
+                            id="newUserName" 
+                            name="userName" 
+                            placeholder="Enter your name" 
+                            required
+                            class="px-3.5 py-2.5 border border-[#262626] rounded-lg text-sm font-sans transition-all duration-150 bg-[#0a0a0a] text-[#e5e5e5] hover:border-[#333333] focus:outline-none focus:border-white focus:shadow-[0_0_0_1px_#ffffff]"
+                        >
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="newUserCourse" class="text-[#e5e5e5] font-medium text-sm">Course</label>
+                        <input 
+                            type="text" 
+                            id="newUserCourse" 
+                            name="userCourse" 
+                            placeholder="e.g., Computer Science" 
+                            required
+                            class="px-3.5 py-2.5 border border-[#262626] rounded-lg text-sm font-sans transition-all duration-150 bg-[#0a0a0a] text-[#e5e5e5] hover:border-[#333333] focus:outline-none focus:border-white focus:shadow-[0_0_0_1px_#ffffff]"
+                        >
+                    </div>
+                    <button type="button" onclick="goToSignupStep2()" class="px-4 py-2.5 bg-white text-[#0a0a0a] border-none rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center justify-center gap-2 hover:bg-[#e5e5e5] active:scale-[0.98] mt-0.5">
+                        Continue
+                        <i data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4 ml-0.5"></i>
+                    </button>
+                </div>
+                <div id="signup-step-2" class="flex flex-col gap-2.5 md:gap-3 hidden">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="newUserYear" class="text-[#e5e5e5] font-medium text-sm">Year level</label>
+                        <select id="newUserYear" name="userYear" required class="px-3.5 py-2.5 border border-[#262626] rounded-lg text-sm font-sans transition-all duration-150 bg-[#0a0a0a] text-[#e5e5e5] cursor-pointer hover:border-[#333333] focus:outline-none focus:border-white focus:shadow-[0_0_0_1px_#ffffff]">
+                            <option value="">Select your year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                            <option value="Graduate">Graduate</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2 md:gap-3 mt-0.5">
+                        <button type="button" onclick="goToSignupStep1()" class="px-3 md:px-4 py-2.5 bg-[#262626] text-[#e5e5e5] border-none rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center justify-center gap-2 hover:bg-[#333333] active:scale-[0.98]">
+                            <i data-lucide="arrow-left" class="lucide lucide-arrow-left w-4 h-4"></i>
+                            Back
+                        </button>
+                        <button type="button" onclick="goToSignupStep3()" class="flex-1 px-3 md:px-4 py-2.5 bg-white text-[#0a0a0a] border-none rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center justify-center gap-2 hover:bg-[#e5e5e5] active:scale-[0.98]">
+                            Continue
+                            <i data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4 ml-0.5"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="signup-step-3" class="flex flex-col gap-2.5 md:gap-3 hidden">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="newUserPassword" class="text-[#e5e5e5] font-medium text-sm">Password</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="newUserPassword" 
+                                name="password" 
+                                placeholder="Create a password" 
+                                minlength="4"
+                                required
+                                class="w-full px-3.5 py-2.5 pr-10 border border-[#262626] rounded-lg text-sm font-sans transition-all duration-150 bg-[#0a0a0a] text-[#e5e5e5] hover:border-[#333333] focus:outline-none focus:border-white focus:shadow-[0_0_0_1px_#ffffff]"
+                            >
+                            <button 
+                                type="button" 
+                                onclick="togglePassword('newUserPassword', 'toggleNewPassword')" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#a3a3a3] transition-colors duration-150"
+                            >
+                                <i data-lucide="eye" id="toggleNewPassword" class="lucide lucide-eye w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="confirmPassword" class="text-[#e5e5e5] font-medium text-sm">Confirm password</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                placeholder="Confirm your password" 
+                                minlength="4"
+                                required
+                                class="w-full px-3.5 py-2.5 pr-10 border border-[#262626] rounded-lg text-sm font-sans transition-all duration-150 bg-[#0a0a0a] text-[#e5e5e5] hover:border-[#333333] focus:outline-none focus:border-white focus:shadow-[0_0_0_1px_#ffffff]"
+                            >
+                            <button 
+                                type="button" 
+                                onclick="togglePassword('confirmPassword', 'toggleConfirmPassword')" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#a3a3a3] transition-colors duration-150"
+                            >
+                                <i data-lucide="eye" id="toggleConfirmPassword" class="lucide lucide-eye w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 md:gap-3 mt-0.5">
+                        <button type="button" onclick="goToSignupStep2()" class="px-3 md:px-4 py-2.5 bg-[#262626] text-[#e5e5e5] border-none rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center justify-center gap-2 hover:bg-[#333333] active:scale-[0.98]">
+                            <i data-lucide="arrow-left" class="lucide lucide-arrow-left w-4 h-4"></i>
+                            Back
+                        </button>
+                        <button type="submit" class="flex-1 px-3 md:px-4 py-2.5 bg-white text-[#0a0a0a] border-none rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 inline-flex items-center justify-center gap-2 hover:bg-[#e5e5e5] active:scale-[0.98]">
+                            Create account
+                            <i data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4 ml-0.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="mt-2.5 md:mt-4 text-center">
+                <p class="text-[#a3a3a3] text-sm">Already have an account? <a href="login.html" class="text-white font-medium underline underline-offset-2 transition-colors duration-150 hover:text-[#e5e5e5]">Sign in</a></p>
+            </div>
+            <div class="flex justify-center gap-2.5 md:gap-3 mt-2.5 md:mt-5 whitespace-nowrap overflow-x-auto">
+                <div class="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+                    <i data-lucide="book-open" class="lucide lucide-book-open w-3.5 h-3.5 md:w-4 md:h-4 text-[#737373]"></i>
+                    <span class="text-[0.75rem] md:text-[0.8125rem] text-[#737373] font-normal">100+ lessons</span>
+                </div>
+                <div class="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+                    <i data-lucide="gamepad-2" class="lucide lucide-gamepad-2 w-3.5 h-3.5 md:w-4 md:h-4 text-[#737373]"></i>
+                    <span class="text-[0.75rem] md:text-[0.8125rem] text-[#737373] font-normal">Fun games</span>
+                </div>
+                <div class="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+                    <i data-lucide="trophy" class="lucide lucide-trophy w-3.5 h-3.5 md:w-4 md:h-4 text-[#737373]"></i>
+                    <span class="text-[0.75rem] md:text-[0.8125rem] text-[#737373] font-normal">Track progress</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Step navigation
+        function goToSignupStep2() {
+            const nameInput = document.getElementById('newUserName');
+            const courseInput = document.getElementById('newUserCourse');
+            if (!nameInput.value.trim() || !courseInput.value.trim()) {
+                if (!nameInput.value.trim()) nameInput.focus();
+                else courseInput.focus();
+                return;
+            }
+            document.getElementById('signup-step-1').classList.add('hidden');
+            document.getElementById('signup-step-2').classList.remove('hidden');
+            document.getElementById('signup-step-3').classList.add('hidden');
+            updateSignupStepIndicators(2);
+            document.getElementById('newUserYear').focus();
+            lucide.createIcons();
+        }
+        function goToSignupStep1() {
+            document.getElementById('signup-step-2').classList.add('hidden');
+            document.getElementById('signup-step-3').classList.add('hidden');
+            document.getElementById('signup-step-1').classList.remove('hidden');
+            updateSignupStepIndicators(1);
+            lucide.createIcons();
+        }
+        function goToSignupStep3() {
+            const yearInput = document.getElementById('newUserYear');
+            if (!yearInput.value) {
+                yearInput.focus();
+                return;
+            }
+            document.getElementById('signup-step-1').classList.add('hidden');
+            document.getElementById('signup-step-2').classList.add('hidden');
+            document.getElementById('signup-step-3').classList.remove('hidden');
+            updateSignupStepIndicators(3);
+            document.getElementById('newUserPassword').focus();
+            lucide.createIcons();
+        }
+        function updateSignupStepIndicators(activeStep) {
+            const indicators = [
+                document.getElementById('signup-step1-indicator'),
+                document.getElementById('signup-step2-indicator'),
+                document.getElementById('signup-step3-indicator')
+            ];
+            indicators.forEach((indicator, index) => {
+                if (index + 1 === activeStep) {
+                    indicator.classList.remove('bg-[#262626]');
+                    indicator.classList.add('bg-white');
+                } else {
+                    indicator.classList.remove('bg-white');
+                    indicator.classList.add('bg-[#262626]');
+                }
+            });
+        }
+        // Toggle password visibility
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+        // Get all users from localStorage
+        function getAllUsers() {
+            const users = localStorage.getItem('signLanguageUsers');
+            return users ? JSON.parse(users) : [];
+        }
+        // Save all users to localStorage
+        function saveAllUsers(users) {
+            localStorage.setItem('signLanguageUsers', JSON.stringify(users));
+        }
+        // Hash password (simple hash for demo)
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
+        }
+        // Find user by name
+        function findUserByName(name) {
+            const users = getAllUsers();
+            return users.find(user => user.name.toLowerCase() === name.toLowerCase());
+        }
+        // Handle signup
+        function handleNewUserSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('newUserName').value.trim();
+            const course = document.getElementById('newUserCourse').value.trim();
+            const year = document.getElementById('newUserYear').value;
+            const password = document.getElementById('newUserPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                alert('Passwords do not match! Please try again.');
+                return;
+            }
+            const existingUser = findUserByName(name);
+            if (existingUser) {
+                alert('A user with this name already exists! Please login or use a different name.');
+                return;
+            }
+            const newUser = {
+                name: name,
+                course: course,
+                year: year,
+                password: hashPassword(password),
+                createdAt: new Date().toISOString(),
+                progress: {
+                    asl: {
+                        learned: {
+                            alphabet: [],
+                            numbers: [],
+                            greetings: [],
+                            common: []
+                        },
+                        totalScore: 0,
+                        quizzesTaken: 0,
+                        achievements: []
+                    },
+                    fsl: {
+                        learned: {
+                            alphabet: [],
+                            numbers: [],
+                            greetings: [],
+                            common: []
+                        },
+                        totalScore: 0,
+                        quizzesTaken: 0,
+                        achievements: []
+                    }
+                }
+            };
+            const users = getAllUsers();
+            users.push(newUser);
+            saveAllUsers(users);
+            const userData = {
+                name: name,
+                course: course,
+                year: year
+            };
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            alert('Account created successfully! Welcome aboard! 🎉');
+            // Redirect to home page
+            window.location.href = 'home.html';
+        }
+        // Check if user is already logged in
+        window.addEventListener('DOMContentLoaded', function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                window.location.href = 'home.html';
+            }
+            // Initialize Lucide icons
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+@keyframes titleShine {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes correctPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.2); }
+}
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(-8deg); }
+    75% { transform: translateX(-50%) rotate(8deg); }
+}
+.animate-hero-fade {
+    animation: heroFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-slide-up {
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-fade-in {
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-shake {
+    animation: shake 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-correct-pulse {
+    animation: correctPulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-wrong-shake {
+    animation: wrongShake 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gradient-text {
+    background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.icon-hand-peace {
+    background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.launch-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+.launch-button:hover::before {
+    left: 100%;
+}
+.hidden {
+    display: none !important;
+}
+.show {
+    display: block !important;
+}
+.section {
+    display: none;
+}
+.section.active {
+    display: block !important;
+}
+.nav-btn.active,
+button.active[data-section] {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+}
+.option-btn {
+    padding: 1.25rem 1rem;
+    background: #171717;
+    border: 2px solid #262626;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-weight: 500;
+    color: #e5e5e5;
+}
+.option-btn:hover {
+    border-color: #0ea5e9;
+    background: #1a1a1a;
+}
+.option-btn.correct {
+    background: #10b981 !important;
+    color: white !important;
+    border-color: #10b981 !important;
+}
+.option-btn.incorrect {
+    background: #ef4444 !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+}
+.option-btn:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+.rhythm-option-btn {
+    padding: 1.25rem 1rem;
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #e5e5e5;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.rhythm-option-btn:hover {
+    background: #ffffff;
+    color: #0a0a0a;
+    border-color: #ffffff;
+}
+.rhythm-option-btn:active {
+    transform: scale(0.95);
+}
+.feedback.correct {
+    background: #064e3b !important;
+    color: #d1fae5 !important;
+    border: 1px solid #10b981 !important;
+}
+.feedback.incorrect {
+    background: #7f1d1d !important;
+    color: #fee2e2 !important;
+    border: 1px solid #ef4444 !important;
+}
+.rhythm-feedback.show {
+    opacity: 1 !important;
+}
+.rhythm-feedback.correct {
+    color: #10b981 !important;
+}
+.rhythm-feedback.wrong {
+    color: #ef4444 !important;
+}
+.falling-sign.rhythm-correct {
+    animation: correctPulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.falling-sign.rhythm-wrong {
+    animation: wrongShake 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.login-error.show {
+    display: block !important;
+}
+.user-info-text {
+    flex: 1;
+    text-align: left;
+}
+.user-info-display p {
+    margin: 0.03rem 0;
+    color: #a3a3a3;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+}
+.user-info-display strong {
+    color: #ffffff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+.logout-btn {
+    background: #ffffff;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.logout-btn:hover {
+    background: #e5e5e5;
+}
+.logout-btn:active {
+    transform: scale(0.98);
+}
+.achievement-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.achievement-icon {
+    font-size: 2rem;
+}
+.achievement-text h4 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+.achievement-text p {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+.achievement-item.locked {
+    opacity: 0.4;
+}
+.progress-item {
+    margin-bottom: 1.5rem;
+}
+.progress-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+.progress-item-name {
+    font-weight: 500;
+    color: #e5e5e5;
+    font-size: 0.875rem;
+}
+.progress-item-percentage {
+    color: #0ea5e9;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
