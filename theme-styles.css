@@ -1,6 +1,4 @@
-/* === GESTURIX THEME STYLES === */
-
-/* < CSS Variables > */
+/* === CSS VARIABLES === */
 :root {
     --color-main-bg: #000035;
     --color-container-bg: #0b0b7e;
@@ -13,7 +11,7 @@
     --color-border-hover: #ffff02;
 }
 
-/* < Theme Toggle Button > */
+/* === THEME TOGGLE BUTTON === */
 .theme-toggle-btn {
     display: inline-flex;
     align-items: center;
@@ -36,21 +34,21 @@
 .theme-toggle-btn:active { transform: scale(0.98); }
 .theme-label { font-weight: 500; }
 
-/* < Global Styles > */
+/* === BODY & MAIN CONTAINERS === */
 body, html, #mainApp {
     background: var(--color-main-bg) !important;
     color: var(--color-text-primary) !important;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* < Header > */
+/* === HEADER === */
 header {
     background: var(--color-container-bg) !important;
     border-color: var(--color-border) !important;
     backdrop-filter: blur(10px);
 }
 
-/* < Containers > */
+/* === BACKGROUND COLORS === */
 .bg-\[\#0a0a0a\], .bg-\[\#171717\], .bg-\[\#0b0b7e\] {
     background: var(--color-container-bg) !important;
 }
@@ -58,12 +56,12 @@ header {
     background: var(--color-secondary-bg) !important;
 }
 
-/* < Borders > */
+/* === BORDER COLORS === */
 .border-\[\#262626\], .border-\[\#0505a3\] {
     border-color: var(--color-border) !important;
 }
 
-/* < Text Colors > */
+/* === TEXT COLORS === */
 .text-\[\#e5e5e5\], .text-\[\#a3a3a3\], .text-\[\#737373\], .text-white {
     color: var(--color-text-primary) !important;
 }
@@ -72,7 +70,7 @@ header {
     opacity: 0.9;
 }
 
-/* < Accent Colors > */
+/* === ACCENT COLORS === */
 .text-\[\#0ea5e9\], .text-\[\#f97316\], .text-primary-500, .text-accent-500, .text-\[\#ffff02\] {
     color: var(--color-accent) !important;
 }
@@ -81,7 +79,7 @@ header {
     color: var(--color-main-bg) !important;
 }
 
-/* < Primary Buttons > */
+/* === PRIMARY BUTTONS === */
 button.bg-white, .btn-primary, button[type="submit"]:not(.btn-secondary), .bg-\[\#ffff02\] {
     background: var(--color-accent) !important;
     color: var(--color-main-bg) !important;
@@ -92,7 +90,7 @@ button.bg-white:hover, .btn-primary:hover, .bg-\[\#ffff02\]:hover {
     box-shadow: 0 4px 12px rgba(255, 255, 2, 0.3);
 }
 
-/* < Secondary Buttons > */
+/* === SECONDARY BUTTONS === */
 .btn-secondary, button.bg-\[\#262626\] {
     background: var(--color-secondary-bg) !important;
     color: var(--color-text-primary) !important;
@@ -102,7 +100,7 @@ button.bg-white:hover, .btn-primary:hover, .bg-\[\#ffff02\]:hover {
     opacity: 0.9;
 }
 
-/* < Navigation > */
+/* === NAVIGATION BUTTONS === */
 .nav-btn {
     background: transparent;
     color: var(--color-text-primary);
@@ -119,7 +117,7 @@ button.bg-white:hover, .btn-primary:hover, .bg-\[\#ffff02\]:hover {
     font-weight: 600;
 }
 
-/* < Category Cards > */
+/* === CATEGORY CARDS === */
 .category-card {
     background: var(--color-container-bg) !important;
     border: 2px solid var(--color-border) !important;
@@ -131,7 +129,7 @@ button.bg-white:hover, .btn-primary:hover, .bg-\[\#ffff02\]:hover {
     transform: translateY(-2px);
 }
 
-/* < Progress Bars > */
+/* === PROGRESS BAR === */
 .progress-bar {
     background: var(--color-secondary-bg);
     overflow: hidden;
@@ -142,7 +140,7 @@ button.bg-white:hover, .btn-primary:hover, .bg-\[\#ffff02\]:hover {
     transition: width 0.3s ease;
 }
 
-/* < Input Fields > */
+/* === INPUT FIELDS === */
 input, select, textarea {
     background: var(--color-main-bg) !important;
     border-color: var(--color-border) !important;
@@ -161,16 +159,17 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 0 1px var(--color-border-hover) !important;
 }
 
-/* < Quiz Options > */
+/* === QUIZ OPTION BUTTONS === */
 .option-btn {
     background: var(--color-container-bg);
     border: 2px solid var(--color-border);
     color: var(--color-text-primary);
     transition: all 0.15s ease;
 }
-.option-btn:hover {
+.option-btn:hover:not(:disabled) {
     border-color: var(--color-accent);
     background: var(--color-secondary-bg);
+    transform: translateY(-1px);
 }
 .option-btn.correct {
     background: #10b981 !important;
@@ -187,20 +186,25 @@ input:focus, select:focus, textarea:focus {
     opacity: 0.6 !important;
 }
 
-/* < Rhythm Game > */
+/* === RHYTHM GAME OPTION BUTTONS === */
 .rhythm-option-btn {
     background: var(--color-container-bg);
     border: 2px solid var(--color-border);
     color: var(--color-text-primary);
+    transition: all 0.15s ease;
 }
 .rhythm-option-btn:hover {
     background: var(--color-accent);
     color: var(--color-main-bg);
     border-color: var(--color-accent);
     font-weight: 600;
+    transform: translateY(-2px);
+}
+.rhythm-option-btn:active {
+    transform: scale(0.95);
 }
 
-/* < Cards and Stats > */
+/* === STAT CARDS === */
 .stat-card {
     background: var(--color-container-bg);
     border: 1px solid var(--color-border);
@@ -213,21 +217,24 @@ input:focus, select:focus, textarea:focus {
 }
 .achievement-item.unlocked { border-color: var(--color-accent); }
 
-/* < Modals > */
+/* === MODAL & DIALOGS === */
 .modal, .dialog {
     background: var(--color-container-bg);
     border: 2px solid var(--color-border);
 }
 
-/* < Special Buttons > */
+/* === LOGOUT BUTTON === */
 .logout-btn {
     background: var(--color-accent) !important;
     color: var(--color-main-bg) !important;
     font-weight: 600;
 }
-.logout-btn:hover { background: var(--color-accent-hover) !important; }
+.logout-btn:hover { 
+    background: var(--color-accent-hover) !important; 
+    box-shadow: 0 2px 8px rgba(255, 255, 2, 0.3);
+}
 
-/* < Selectors > */
+/* === LANGUAGE SELECT === */
 #languageSelect {
     background: var(--color-container-bg) !important;
     border-color: var(--color-border) !important;
@@ -235,20 +242,20 @@ input:focus, select:focus, textarea:focus {
 }
 #languageSelect:focus { border-color: var(--color-accent) !important; }
 
-/* < Links > */
+/* === LINKS === */
 a {
     color: var(--color-accent);
     transition: color 0.15s ease;
 }
 a:hover { color: var(--color-accent-hover); }
 
-/* < Icons > */
+/* === ICONS === */
 .lucide[class*="text-primary"], .lucide[class*="text-accent"],
 i.bi[class*="text-primary"], i.bi[class*="text-accent"] {
     color: var(--color-accent) !important;
 }
 
-/* < Feedback Messages > */
+/* === FEEDBACK MESSAGES === */
 .feedback.correct {
     background: rgba(16, 185, 129, 0.2) !important;
     color: #10b981 !important;
@@ -260,37 +267,37 @@ i.bi[class*="text-primary"], i.bi[class*="text-accent"] {
     border: 1px solid #ef4444 !important;
 }
 
-/* < Loading > */
+/* === LOADING INDICATOR === */
 .loading { color: var(--color-accent); }
 
-/* < Scrollbar > */
+/* === SCROLLBAR === */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--color-secondary-bg); }
 ::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-hover); }
 
-/* < Selection > */
+/* === TEXT SELECTION === */
 ::selection { background: var(--color-accent); color: var(--color-main-bg); }
 ::-moz-selection { background: var(--color-accent); color: var(--color-main-bg); }
 
-/* < Focus > */
+/* === FOCUS VISIBLE === */
 *:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
 }
 
-/* < Disabled States > */
+/* === DISABLED STATES === */
 button:disabled, input:disabled, select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-/* < Shadows > */
+/* === SHADOWS === */
 .shadow, .shadow-sm, .shadow-md, .shadow-lg {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* < User Info > */
+/* === USER INFO DISPLAY === */
 .user-info-display {
     background: var(--color-container-bg);
     border: 1px solid var(--color-border);
@@ -298,7 +305,7 @@ button:disabled, input:disabled, select:disabled {
     border-radius: 8px;
 }
 
-/* < Progress Sections > */
+/* === PROGRESS SECTION === */
 .progress-card-main, .category-progress, .achievements, .rhythm-stats-grid {
     background: var(--color-container-bg) !important;
     border-color: var(--color-border) !important;
@@ -309,14 +316,14 @@ button:disabled, input:disabled, select:disabled {
     font-weight: 700;
 }
 
-/* < Lesson Cards > */
+/* === FLASHCARDS === */
 .flashcard {
     background: var(--color-container-bg);
     border: 2px solid var(--color-border);
 }
 .flashcard:hover { border-color: var(--color-accent); }
 
-/* < Quiz Results > */
+/* === QUIZ RESULTS === */
 .quiz-results {
     background: var(--color-container-bg);
     border: 2px solid var(--color-border);
@@ -324,7 +331,7 @@ button:disabled, input:disabled, select:disabled {
     border-radius: 16px;
 }
 
-/* < Badges > */
+/* === BADGES === */
 .badge {
     background: var(--color-accent);
     color: var(--color-main-bg);
@@ -334,20 +341,20 @@ button:disabled, input:disabled, select:disabled {
     font-weight: 600;
 }
 
-/* < Hover Effects > */
+/* === INTERACTIVE ELEMENTS === */
 .interactive:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* < Animations > */
+/* === ACCENT GLOW ANIMATION === */
 @keyframes accentGlow {
     0%, 100% { box-shadow: 0 0 10px var(--color-accent); opacity: 0.5; }
     50% { box-shadow: 0 0 20px var(--color-accent); opacity: 0.8; }
 }
 .glow-accent { animation: accentGlow 2s infinite; }
 
-/* < Light Mode Overrides > */
+/* === LIGHT MODE SPECIFIC === */
 [data-theme="light"] .shadow, [data-theme="light"] .shadow-sm,
 [data-theme="light"] .shadow-md, [data-theme="light"] .shadow-lg {
     box-shadow: 0 4px 20px rgba(15, 15, 108, 0.15);
@@ -355,14 +362,46 @@ button:disabled, input:disabled, select:disabled {
 [data-theme="light"] input, [data-theme="light"] select, [data-theme="light"] textarea {
     background: #ffffff !important;
 }
+[data-theme="light"] button:hover {
+    box-shadow: 0 2px 12px rgba(71, 152, 194, 0.2);
+}
+[data-theme="light"] .option-btn:hover:not(:disabled) {
+    background: #e8f4f8;
+    transform: translateY(-1px);
+}
+[data-theme="light"] .rhythm-option-btn:hover {
+    box-shadow: 0 4px 12px rgba(71, 152, 194, 0.3);
+}
 
-/* < Responsive > */
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
     .category-card, .stat-card { padding: 16px; }
     .theme-toggle-btn { padding: 0.4rem 0.8rem; font-size: 0.8125rem; }
 }
 
-/* < Print > */
+/* === PRINT MODE === */
 @media print {
     body { background: white !important; color: black !important; }
+}
+
+/* === BACK BUTTON HOVER FIX === */
+button[onclick*="index.html"]:hover {
+    background: var(--color-secondary-bg) !important;
+}
+
+/* === GENERAL BUTTON HOVER FIXES === */
+button:not(.option-btn):not(.rhythm-option-btn):not(.theme-toggle-btn):hover {
+    /* Prevents black background on hover */
+    background-color: inherit;
+}
+
+/* Make sure primary action buttons maintain their style on hover */
+button[style*="background: var(--color-accent)"]:hover {
+    background: var(--color-accent-hover) !important;
+}
+
+/* Make sure secondary action buttons maintain their style on hover */
+button[style*="background: var(--color-secondary-bg)"]:hover {
+    background: var(--color-border) !important;
+    opacity: 0.85;
 }

@@ -34,7 +34,7 @@ function displayUserInfo(userData) {
 }
 
 
-//Get full name from user data
+
 
 function getFullName(userData) {
     if (userData.firstName && userData.lastName) {
@@ -47,7 +47,7 @@ function getFullName(userData) {
 }
 
 
-//Migrate old users to new name format
+
 
 function migrateOldUserData() {
     const users = getAllUsers();
@@ -85,7 +85,7 @@ function migrateOldUserData() {
     }
 }
 
-// Run migration on page load
+
 document.addEventListener('DOMContentLoaded', function() {
     migrateOldUserData();
 });
@@ -470,7 +470,7 @@ async function updateHomeStats() {
     await checkAchievements(langProgress, false);
 }
 async function navigateToSection(sectionName) {
-    // update visible section and active button
+    
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
     });
@@ -482,7 +482,7 @@ async function navigateToSection(sectionName) {
         }
     });
 
-    // remember for refresh
+   
     localStorage.setItem('currentSection', sectionName);
     currentSection = sectionName;
 
@@ -503,10 +503,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // restore last open tab (section) if available
+    
     const saved = localStorage.getItem('currentSection');
     if (saved && document.getElementById(saved)) {
-        // call navigateToSection so UI state updates correctly
+        
         navigateToSection(saved);
     }
 });
@@ -514,7 +514,7 @@ function showLesson(category) {
     currentCategory = category;
     currentSignIndex = 0;
 
-    // hide the initial headings/category list
+    
     const heading = document.querySelector('#lessons h2');
     const sub = document.querySelector('#lessons p');
     if (heading) heading.style.display = 'none';
@@ -532,7 +532,7 @@ function showLesson(category) {
     displayCurrentSign();
 }
 function hideLesson() {
-    // bring back heading & subtitle
+    
     const heading = document.querySelector('#lessons h2');
     const sub = document.querySelector('#lessons p');
     if (heading) heading.style.display = '';
@@ -687,13 +687,13 @@ async function showQuizResults() {
     document.getElementById('percentage').textContent = percentage + '%';
     let message = '';
     if (percentage === 100) {
-        message = '🌟 Perfect score! You\'re a sign language master!';
+        message = 'Perfect score! You\'re a sign language master!';
     } else if (percentage >= 80) {
-        message = '🎉 Excellent work! Keep it up!';
+        message = ' Excellent work! Keep it up!';
     } else if (percentage >= 60) {
-        message = '👍 Good job! Practice a bit more to master it!';
+        message = 'Good job! Practice a bit more to master it!';
     } else {
-        message = '💪 Keep practicing! You\'ll get better!';
+        message = 'Keep practicing! You\'ll get better!';
     }
     document.getElementById('resultsMessage').textContent = message;
     await updateQuizStats(quizScore, currentQuiz.totalQuestions);
@@ -1087,11 +1087,11 @@ async function showRhythmGameResults() {
     document.getElementById('rhythmMaxCombo').textContent = rhythmGame.maxCombo;
     let message = '';
     if (rhythmGame.score >= 100) {
-        message = '🌟 Amazing! You have great rhythm!';
+        message = ' Amazing! You have great rhythm!';
     } else if (rhythmGame.score >= 50) {
-        message = '🎉 Good job! Keep practicing!';
+        message = ' Good job! Keep practicing!';
     } else {
-        message = '💪 Nice try! Practice makes perfect!';
+        message = ' Nice try! Practice makes perfect!';
     }
     document.getElementById('rhythmResultMessage').textContent = message;
     await saveRhythmGameStats(rhythmGame.score, rhythmGame.maxCombo);

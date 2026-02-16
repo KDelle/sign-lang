@@ -1,11 +1,11 @@
-/* === GESTURIX THEME MANAGER === */
 
-/* < Constants > */
+
+
 const THEME_KEY = 'gesturix-theme';
 const THEME_DARK = 'dark';
 const THEME_LIGHT = 'light';
 
-/* < Color Schemes > */
+
 const COLORS = {
     dark: {
         mainBg: '#000035',
@@ -31,14 +31,14 @@ const COLORS = {
     }
 };
 
-/* < Get Stored Theme > */
+
 function getStoredTheme() {
     const stored = localStorage.getItem(THEME_KEY);
     if (stored === THEME_LIGHT || stored === THEME_DARK) return stored;
     return THEME_DARK;
 }
 
-/* < Apply Theme Colors > */
+
 function applyThemeColors(theme) {
     const colors = COLORS[theme];
     const root = document.documentElement;
@@ -54,7 +54,7 @@ function applyThemeColors(theme) {
     root.style.setProperty('--color-border-hover', colors.borderHover);
 }
 
-/* < Set Theme > */
+
 function setTheme(theme) {
     localStorage.setItem(THEME_KEY, theme);
     document.documentElement.setAttribute('data-theme', theme);
@@ -64,14 +64,14 @@ function setTheme(theme) {
     window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
 }
 
-/* < Toggle Theme > */
+
 function toggleTheme() {
     const current = getStoredTheme();
     const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
     setTheme(next);
 }
 
-/* < Update Toggle Button > */
+
 function updateToggleButton(theme) {
     const btn = document.getElementById('themeToggle');
     if (!btn) return;
@@ -92,7 +92,7 @@ function updateToggleButton(theme) {
     btn.setAttribute('title', theme === THEME_DARK ? 'Switch to light mode' : 'Switch to dark mode');
 }
 
-/* < Update Logo > */
+
 function updateLogo(theme) {
     const logos = document.querySelectorAll('.theme-logo');
     logos.forEach(logo => {
@@ -110,7 +110,7 @@ function updateLogo(theme) {
     });
 }
 
-/* < Initialize Theme > */
+
 function initTheme() {
     const theme = getStoredTheme();
     document.documentElement.setAttribute('data-theme', theme);
@@ -119,7 +119,7 @@ function initTheme() {
     updateLogo(theme);
 }
 
-/* < Create Toggle Button HTML > */
+
 function createThemeToggleButton() {
     const theme = getStoredTheme();
     const icon = theme === THEME_DARK ? 'sun' : 'moon';
@@ -139,7 +139,7 @@ function createThemeToggleButton() {
     `;
 }
 
-/* < Auto-Initialize > */
+
 if (document.readyState === 'loading') {
     applyThemeColors(getStoredTheme());
     document.addEventListener('DOMContentLoaded', initTheme);
@@ -147,7 +147,7 @@ if (document.readyState === 'loading') {
     initTheme();
 }
 
-/* < Global Functions > */
+
 window.toggleTheme = toggleTheme;
 window.setTheme = setTheme;
 window.getStoredTheme = getStoredTheme;

@@ -1,12 +1,8 @@
-/* === GESTURIX STATS DATABASE (IndexedDB) === */
-
-/* < Database Config > */
 const DB_NAME = 'GesturixDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'userStats';
 let db = null;
 
-/* < Initialize Database > */
 function initDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -26,7 +22,7 @@ function initDB() {
     });
 }
 
-/* < Save Stats > */
+
 function saveStatsToIndexedDB(userId, userName, stats) {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -47,7 +43,7 @@ function saveStatsToIndexedDB(userId, userName, stats) {
     });
 }
 
-/* < Load Stats > */
+
 function loadStatsFromIndexedDB(userId) {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -62,7 +58,7 @@ function loadStatsFromIndexedDB(userId) {
     });
 }
 
-/* < Delete Stats > */
+
 function deleteStatsFromIndexedDB(userId) {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -77,7 +73,7 @@ function deleteStatsFromIndexedDB(userId) {
     });
 }
 
-/* < Get All Stats > */
+
 function getAllStatsFromIndexedDB() {
     return new Promise((resolve, reject) => {
         if (!db) {
@@ -92,7 +88,7 @@ function getAllStatsFromIndexedDB() {
     });
 }
 
-/* < Generate User ID > */
+
 function generateUserId(userData) {
     if (userData.userId) return userData.userId;
     const timestamp = Date.now();
@@ -100,7 +96,7 @@ function generateUserId(userData) {
     return `user_${userData.name.toLowerCase().replace(/\s+/g, '_')}_${timestamp}_${randomSuffix}`;
 }
 
-/* < Default Stats > */
+
 function getDefaultStats() {
     return {
         asl: {
@@ -122,7 +118,7 @@ function getDefaultStats() {
     };
 }
 
-/* < Merge Stats > */
+
 function mergeStats(existingStats, newStats) {
     if (!existingStats) return newStats;
     const merged = JSON.parse(JSON.stringify(existingStats));
@@ -150,7 +146,7 @@ function mergeStats(existingStats, newStats) {
     return merged;
 }
 
-/* < Save User Stats > */
+
 async function saveUserStatsDB() {
     try {
         const currentUser = localStorage.getItem('currentUser');
@@ -178,7 +174,7 @@ async function saveUserStatsDB() {
     }
 }
 
-/* < Load User Stats > */
+
 async function loadUserStatsDB() {
     try {
         const currentUser = localStorage.getItem('currentUser');
@@ -211,7 +207,7 @@ async function loadUserStatsDB() {
     }
 }
 
-/* < Reset User Stats > */
+
 async function resetUserStatsDB() {
     try {
         const currentUser = localStorage.getItem('currentUser');
@@ -228,7 +224,7 @@ async function resetUserStatsDB() {
     }
 }
 
-/* < Auto-Save > */
+
 let autoSaveInterval = null;
 
 function startAutoSave(intervalMs = 30000) {
@@ -243,7 +239,7 @@ function stopAutoSave() {
     }
 }
 
-/* < Update Rhythm Stats > */
+
 async function updateRhythmGameStatsDB(score, maxCombo) {
     try {
         const currentUser = localStorage.getItem('currentUser');
@@ -269,7 +265,7 @@ async function updateRhythmGameStatsDB(score, maxCombo) {
     }
 }
 
-/* < Export API > */
+
 window.StatsDB = {
     init: initDB,
     save: saveUserStatsDB,

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gesturix - Sign Language Learning</title>
     
-    <!-- Favicon -->
+    
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -17,11 +17,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Theme Styles -->
+    
     <link rel="stylesheet" href="theme-styles.css">
     <link rel="stylesheet" href="animations.css">
     
-    <!-- Theme Manager - Load early to prevent flash -->
+    
     <script src="theme-manager.js"></script>
     
     <script>
@@ -55,7 +55,7 @@
     </script>
 </head>
 <body class="font-sans leading-relaxed antialiased overflow-x-hidden m-0 p-0">
-    <!-- Theme Toggle Button (Fixed Position) -->
+    
     <div class="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <button 
             id="themeToggle" 
@@ -72,7 +72,7 @@
     <section class="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden px-6 md:px-8 py-8">
         <div class="relative text-center max-w-[800px] mx-auto animate-hero-fade">
             
-            <!-- Logo (with theme-aware class) -->
+            
             <div class="mb-8 flex justify-center">
                 <img 
                     src="darkmodelogo.png"
@@ -81,27 +81,27 @@
                 >
             </div>
             
-            <!-- Badge -->
+            
             <div class="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-container-bg)] border border-[var(--color-border)] rounded-full text-[0.8125rem] font-medium mb-8" style="color: var(--color-text-primary);">
                 <i data-lucide="hand" class="lucide lucide-hand w-4 h-4" style="color: var(--color-accent);"></i>
                 <span>Learn sign language</span>
             </div>
             
-            <!-- Title -->
+            
             <h1 class="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-5 tracking-tighter leading-tight" style="color: var(--color-text-primary);">Gesturix</h1>
             
-            <!-- Description -->
+            
             <p class="text-base md:text-lg leading-relaxed opacity-90 mb-12 max-w-[600px] mx-auto font-normal" style="color: var(--color-text-primary);">
                 Master American Sign Language (ASL) and Filipino Sign Language (FSL) through interactive lessons and engaging practice.
             </p>
             
-            <!-- CTA Button -->
+            
             <button class="px-8 py-3.5 border-none rounded-lg text-[0.9375rem] font-bold cursor-pointer transition-all duration-150 inline-flex items-center gap-2 hover:shadow-lg active:scale-[0.98]" onclick="getStarted()" style="background: var(--color-accent); color: var(--color-main-bg);">
                 Get started
                 <i data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4 ml-0.5"></i>
             </button>
             
-            <!-- Features -->
+            
             <div class="flex items-center justify-between gap-2 md:gap-8 mt-12 pt-12 border-t flex-nowrap w-full" style="border-color: var(--color-border);">
                 <div class="flex items-center gap-1.5 opacity-80 text-xs md:text-sm" style="color: var(--color-text-primary);">
                     <i data-lucide="book-open" class="lucide lucide-book-open w-4 h-4 md:w-5 md:h-5" style="color: var(--color-accent);"></i>
@@ -121,26 +121,26 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-        // Check if user is already logged in
+        
         function checkUserSession() {
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
-                // User is already logged in, redirect to home
+                
                 window.location.href = 'home.html';
                 return true;
             }
             return false;
         }
         
-        // Get Started button - redirect to login/signup page
+        
         function getStarted() {
             window.location.href = 'login.html';
         }
         
-        // Check session on page load
+        
         window.addEventListener('DOMContentLoaded', function() {
             checkUserSession();
-            // Initialize Lucide icons
+            
             lucide.createIcons();
         });
     </script>
