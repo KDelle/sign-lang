@@ -1,58 +1,48 @@
-/**
- * GESTURIX THEME MANAGER
- * Handles light/dark mode switching with proper color schemes
- */
+/* === GESTURIX THEME MANAGER === */
 
+/* < Constants > */
 const THEME_KEY = 'gesturix-theme';
 const THEME_DARK = 'dark';
 const THEME_LIGHT = 'light';
 
-// Color schemes based on your logo designs
+/* < Color Schemes > */
 const COLORS = {
     dark: {
-        // Dark mode - based on darkmodelogo.png (yellow & blue)
-        mainBg: '#000035',           // Deep navy blue background
-        containerBg: '#1a1a7e',      // Slightly lighter blue for containers
-        secondaryBg: '#2a2a8e',      // Secondary blue elements
-        accentYellow: '#ffff02',     // Bright yellow accent (from logo)
-        accentYellowHover: '#e6e602',// Yellow hover state
-        textPrimary: '#ffffff',      // White text
-        textSecondary: '#e0e0e0',    // Light gray text
-        border: '#3a3a9e',           // Border color
-        borderHover: '#ffff02',      // Yellow border on hover
+        mainBg: '#000035',
+        containerBg: '#1a1a7e',
+        secondaryBg: '#2a2a8e',
+        accentYellow: '#ffff02',
+        accentYellowHover: '#e6e602',
+        textPrimary: '#ffffff',
+        textSecondary: '#e0e0e0',
+        border: '#3a3a9e',
+        borderHover: '#ffff02',
     },
     light: {
-        // Light mode - based on lightmodelogo.png (turquoise/teal palette)
-        mainBg: '#f0f8fa',           // Very light blue-white background
-        containerBg: '#ffffff',      // Pure white containers
-        secondaryBg: '#e8f4f8',      // Light blue-gray secondary
-        accentYellow: '#4798C2',     // Ocean blue accent (from palette)
-        accentYellowHover: '#3a7ba8',// Darker blue hover
-        textPrimary: '#2c5f6f',      // Dark teal text
-        textSecondary: '#5a8a9a',    // Medium teal text
-        border: '#7BBDC9',           // Turquoise border (from palette)
-        borderHover: '#4798C2',      // Ocean blue border on hover (from palette)
+        mainBg: '#f0f8fa',
+        containerBg: '#ffffff',
+        secondaryBg: '#e8f4f8',
+        accentYellow: '#4798C2',
+        accentYellowHover: '#3a7ba8',
+        textPrimary: '#2c5f6f',
+        textSecondary: '#5a8a9a',
+        border: '#7BBDC9',
+        borderHover: '#4798C2',
     }
 };
 
-/**
- * Get stored theme from localStorage
- */
+/* < Get Stored Theme > */
 function getStoredTheme() {
     const stored = localStorage.getItem(THEME_KEY);
     if (stored === THEME_LIGHT || stored === THEME_DARK) return stored;
-    // Default to dark mode
     return THEME_DARK;
 }
 
-/**
- * Apply theme colors to CSS variables
- */
+/* < Apply Theme Colors > */
 function applyThemeColors(theme) {
     const colors = COLORS[theme];
     const root = document.documentElement;
     
-    // Apply CSS custom properties
     root.style.setProperty('--color-main-bg', colors.mainBg);
     root.style.setProperty('--color-container-bg', colors.containerBg);
     root.style.setProperty('--color-secondary-bg', colors.secondaryBg);
@@ -64,32 +54,24 @@ function applyThemeColors(theme) {
     root.style.setProperty('--color-border-hover', colors.borderHover);
 }
 
-/**
- * Set theme and update UI
- */
+/* < Set Theme > */
 function setTheme(theme) {
     localStorage.setItem(THEME_KEY, theme);
     document.documentElement.setAttribute('data-theme', theme);
     applyThemeColors(theme);
     updateToggleButton(theme);
     updateLogo(theme);
-    
-    // Dispatch custom event for other scripts to listen to
     window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
 }
 
-/**
- * Toggle between light and dark mode
- */
+/* < Toggle Theme > */
 function toggleTheme() {
     const current = getStoredTheme();
     const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
     setTheme(next);
 }
 
-/**
- * Update the theme toggle button UI
- */
+/* < Update Toggle Button > */
 function updateToggleButton(theme) {
     const btn = document.getElementById('themeToggle');
     if (!btn) return;
@@ -98,16 +80,8 @@ function updateToggleButton(theme) {
     const label = btn.querySelector('.theme-label');
     
     if (icon) {
-        // Update icon
-        if (theme === THEME_DARK) {
-            icon.setAttribute('data-lucide', 'sun');
-        } else {
-            icon.setAttribute('data-lucide', 'moon');
-        }
-        // Reinitialize Lucide icons
-        if (window.lucide) {
-            lucide.createIcons();
-        }
+        icon.setAttribute('data-lucide', theme === THEME_DARK ? 'sun' : 'moon');
+        if (window.lucide) lucide.createIcons();
     }
     
     if (label) {
@@ -118,9 +92,7 @@ function updateToggleButton(theme) {
     btn.setAttribute('title', theme === THEME_DARK ? 'Switch to light mode' : 'Switch to dark mode');
 }
 
-/**
- * Update logo based on theme
- */
+/* < Update Logo > */
 function updateLogo(theme) {
     const logos = document.querySelectorAll('.theme-logo');
     logos.forEach(logo => {
@@ -128,11 +100,8 @@ function updateLogo(theme) {
             logo.src = 'darkmodelogo.png';
             logo.alt = 'Gesturix Logo - Dark Mode';
         } else {
-            // Use lightmode.png when available, fallback to darkmodelogo.png
             logo.src = 'lightmode.png';
             logo.alt = 'Gesturix Logo - Light Mode';
-            
-            // Fallback if lightmode.png doesn't exist
             logo.onerror = function() {
                 this.src = 'darkmodelogo.png';
                 this.onerror = null;
@@ -141,9 +110,7 @@ function updateLogo(theme) {
     });
 }
 
-/**
- * Initialize theme on page load
- */
+/* < Initialize Theme > */
 function initTheme() {
     const theme = getStoredTheme();
     document.documentElement.setAttribute('data-theme', theme);
@@ -152,9 +119,7 @@ function initTheme() {
     updateLogo(theme);
 }
 
-/**
- * Create theme toggle button HTML
- */
+/* < Create Toggle Button HTML > */
 function createThemeToggleButton() {
     const theme = getStoredTheme();
     const icon = theme === THEME_DARK ? 'sun' : 'moon';
@@ -174,16 +139,15 @@ function createThemeToggleButton() {
     `;
 }
 
-// Initialize theme as early as possible
+/* < Auto-Initialize > */
 if (document.readyState === 'loading') {
-    // Apply theme colors immediately to prevent flash
     applyThemeColors(getStoredTheme());
     document.addEventListener('DOMContentLoaded', initTheme);
 } else {
     initTheme();
 }
 
-// Make functions available globally
+/* < Global Functions > */
 window.toggleTheme = toggleTheme;
 window.setTheme = setTheme;
 window.getStoredTheme = getStoredTheme;

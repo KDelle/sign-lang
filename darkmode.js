@@ -1,19 +1,24 @@
+/* === LEGACY DARK MODE (Old System) === */
+
 const THEME_KEY = 'gesturix-theme';
 const THEME_DARK = 'dark';
 const THEME_LIGHT = 'light';
 
+/* < Get Theme > */
 function getStoredTheme() {
     const stored = localStorage.getItem(THEME_KEY);
     if (stored === THEME_LIGHT || stored === THEME_DARK) return stored;
     return THEME_DARK;
 }
 
+/* < Set Theme > */
 function setTheme(theme) {
     localStorage.setItem(THEME_KEY, theme);
     document.documentElement.setAttribute('data-theme', theme);
     updateToggleButton(theme);
 }
 
+/* < Toggle Dark Mode > */
 function toggleDarkMode() {
     const current = getStoredTheme();
     const next = current === THEME_DARK ? THEME_LIGHT : THEME_DARK;
@@ -21,6 +26,7 @@ function toggleDarkMode() {
 }
 window.toggleDarkMode = toggleDarkMode;
 
+/* < Update Button > */
 function updateToggleButton(theme) {
     const btn = document.getElementById('darkModeToggle');
     if (!btn) return;
@@ -36,12 +42,14 @@ function updateToggleButton(theme) {
     btn.setAttribute('aria-label', theme === THEME_DARK ? 'Switch to light mode' : 'Switch to dark mode');
 }
 
+/* < Initialize > */
 function initDarkMode() {
     const theme = getStoredTheme();
     document.documentElement.setAttribute('data-theme', theme);
     updateToggleButton(theme);
 }
 
+/* < Auto-Initialize > */
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initDarkMode);
 } else {
